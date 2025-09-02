@@ -25,6 +25,8 @@ export const metadata: Metadata = {
   description: "InsanyShop",
 };
 
+
+
 export default function RootLayout({
   children,
 }: Readonly<{
