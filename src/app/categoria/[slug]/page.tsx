@@ -8,10 +8,12 @@ import { Pagination } from '@/components/Pagination';
 import { fetchProducts } from '@/services/api';
 import type { Product } from '@/types/api';
 import styles from './page.module.css';
+import { useCart } from '@/context/CartContext';
 
 export default function CategoryPage() {
   const searchParams = useSearchParams();
   const params = useParams();
+  const { addItem } = useCart();
   
   const [products, setProducts] = useState<Product[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -28,7 +30,7 @@ export default function CategoryPage() {
     page: number;
     limit: number;
   }>({
-    sort: (searchParams?.get('sort') as any) || 'newest',
+    sort: (searchParams?.get('sort') as any) || 'price-desc',
     page: parseInt(searchParams?.get('page') || '1'),
     limit: 6,
   });
@@ -51,6 +53,23 @@ export default function CategoryPage() {
       console.error('Error formatting category name:', err);
       setCategoryName(slug);
     }
+  }, [slug]);
+
+  // Texto descritivo por categoria (exibido à direita do título)
+  const categoryTagline = useMemo(() => {
+    const key = (slug || '').toString().toLowerCase();
+    const map: Record<string, string> = {
+      eletronicos: 'Smartphones, laptops, consoles e mais',
+      'eletronicos-e-informatica': 'Smartphones, laptops, consoles e mais',
+      tecnologia: 'Smartphones, laptops, consoles e mais',
+      roupas: 'Moda masculina, feminina e infantil',
+      'roupas-e-calcados': 'Moda masculina, feminina e infantil',
+      calcados: 'Tênis, botas, sandálias e mais',
+      esporte: 'Acessórios, vestuário e mais para o seu treino',
+      casa: 'Decoração, utilidades e móveis',
+      livros: 'Ficção, não-ficção, didáticos e mais',
+    };
+    return map[key] || '';
   }, [slug]);
 
   // Carrega os produtos da categoria
@@ -110,6 +129,13 @@ export default function CategoryPage() {
     }
   }, [loadProducts, slug]);
 
+  // Garante que o sort esteja sempre em uma opção de preço nesta página
+  useEffect(() => {
+    if (filters.sort !== 'price-asc' && filters.sort !== 'price-desc') {
+      setFilters(prev => ({ ...prev, sort: 'price-desc' }));
+    }
+  }, [filters.sort]);
+
   const handleFilterChange = (filterType: string, value: string) => {
     setFilters(prev => {
       // Se estiver mudando o tipo de ordenação, volta para a primeira página
@@ -138,8 +164,7 @@ export default function CategoryPage() {
   };
 
   const handleAddToCart = (product: Product) => {
-    // Implementar lógica de adicionar ao carrinho
-    console.log("Adicionado ao carrinho:", product);
+    addItem(product);
   };
 
   // Ordenar produtos localmente (opcional, pode ser feito no backend)
@@ -211,21 +236,28 @@ export default function CategoryPage() {
 
   return (
     <main className={styles.container}>
-      <div className={styles.breadcrumb}>Produto</div>
-      <h1 className={styles.pageTitle}>{categoryName || 'Categoria'}</h1>
-      
+      <div className={styles.breadcrumb}>Produtos / {categoryName || 'Categoria'}</div>
+
+      <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', gap: 16, marginBottom: 8 }}>
+        <h1 className={styles.pageTitle} style={{ marginBottom: 0 }}>{categoryName || 'Categoria'}</h1>
+        {categoryTagline && (
+          <div style={{ color: '#737380' }}>{categoryTagline}</div>
+        )}
+      </div>
+
       <FilterBar 
         currentSort={filters.sort}
+        currentCategory={slug || 'all'}
         onFilterChange={handleFilterChange}
+        hideCategory
+        priceOnly
+        hideTitle
       />
-      
+
       <Cards 
         products={sortedProducts} 
         categoryName={categoryName}
-        onAddToCart={(product) => {
-          // TODO: Implementar adição ao carrinho
-          console.log('Adicionar ao carrinho:', product);
-        }}
+        onAddToCart={(product) => addItem(product)}
       />
       
       {totalPages > 1 && (

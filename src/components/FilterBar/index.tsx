@@ -15,21 +15,29 @@ type FilterBarProps = {
   currentSort: 'newest' | 'price-asc' | 'price-desc' | 'best-sellers';
   currentCategory: string;
   className?: string;
+  hideCategory?: boolean;
+  priceOnly?: boolean;
+  hideTitle?: boolean;
 };
 
-export function FilterBar({ onFilterChange, currentSort, currentCategory, className = '' }: FilterBarProps) {
+export function FilterBar({ onFilterChange, currentSort, currentCategory, className = '', hideCategory = false, priceOnly = false, hideTitle = false }: FilterBarProps) {
   const [isClient, setIsClient] = useState(false);
   const [categories, setCategories] = useState<OptionType[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<string>(currentCategory);
   const [selectedSort, setSelectedSort] = useState<'newest' | 'price-asc' | 'price-desc' | 'best-sellers'>(currentSort);
   const [isLoading, setIsLoading] = useState(true);
 
-  const sortOptions: OptionType[] = [
-    { value: 'newest', label: 'Organizar por' },
-    { value: 'price-desc', label: 'Preço: Maior - menor' },
-    { value: 'price-asc', label: 'Preço: Menor - maior' },
-    { value: 'best-sellers', label: 'Mais vendidos' },
-  ];
+  const sortOptions: OptionType[] = priceOnly
+    ? [
+        { value: 'price-desc', label: 'Preço: Maior - menor' },
+        { value: 'price-asc', label: 'Preço: Menor - maior' },
+      ]
+    : [
+        { value: 'newest', label: 'Organizar por' },
+        { value: 'price-desc', label: 'Preço: Maior - menor' },
+        { value: 'price-asc', label: 'Preço: Menor - maior' },
+        { value: 'best-sellers', label: 'Mais vendidos' },
+      ];
 
   useEffect(() => {
     setIsClient(true);
@@ -86,19 +94,21 @@ export function FilterBar({ onFilterChange, currentSort, currentCategory, classN
     <div className={`${styles.filterBar} ${className}`.trim()}>
       
       <div className={styles.filterControls}>
-        <div className={styles.filterGroup}>
-          <select 
-            className={styles.select}
-            value={selectedCategory}
-            onChange={handleCategoryChange}
-          >
-            {categories.map((option) => (
-              <option key={option.value} value={option.value}>
-                {option.label}
-              </option>
-            ))}
-          </select>
-        </div>
+        {!hideCategory && (
+          <div className={styles.filterGroup}>
+            <select 
+              className={styles.select}
+              value={selectedCategory}
+              onChange={handleCategoryChange}
+            >
+              {categories.map((option) => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
+            </select>
+          </div>
+        )}
         
         <div className={styles.filterGroup}>
           <select 
@@ -115,8 +125,7 @@ export function FilterBar({ onFilterChange, currentSort, currentCategory, classN
         </div>
       </div>
   
-      <h1 className={styles.pageTitle}>Todos os produtos</h1>
+      {!hideTitle && <h1 className={styles.pageTitle}>Todos os produtos</h1>}
     </div>
   );
-  
 }

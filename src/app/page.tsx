@@ -8,13 +8,18 @@ import { FeaturedCategories } from "@/components/FeaturedCategories";
 import { fetchProducts } from "@/services/api";
 import type { Product } from "@/types/api";
 import styles from "./page.module.css";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useCart } from "@/context/CartContext";
 
 export default function Home() {
+  const router = useRouter();
   const [products, setProducts] = useState<Product[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [totalPages, setTotalPages] = useState(1);
   const [totalProducts, setTotalProducts] = useState(0);
+  const searchParams = useSearchParams();
+  const { addItem } = useCart();
   
   const [filters, setFilters] = useState({
     category: "all",
@@ -70,8 +75,25 @@ export default function Home() {
     loadProducts();
   }, [loadProducts]);
 
+  // Sincroniza o termo de busca da URL com o estado de filtros
+  useEffect(() => {
+    const term = (searchParams.get('search') || '').trim();
+    setFilters(prev => {
+      // Se o termo da URL é diferente do estado atual, atualiza e volta para página 1
+      if ((prev.search || '') !== term) {
+        return { ...prev, search: term, page: 1 };
+      }
+      return prev;
+    });
+  }, [searchParams]);
+
   const handleFilterChange = (filterType: string, value: string) => {
     console.log('Filter changed:', { filterType, value });
+    if (filterType === 'category' && value && value !== 'all') {
+      // Navega para a página de categoria dedicada
+      router.push(`/categoria/${value}`);
+      return;
+    }
     setFilters(prev => ({
       ...prev,
       [filterType]: value,
@@ -111,8 +133,7 @@ export default function Home() {
   };
 
   const handleAddToCart = (product: Product) => {
-    // Implementar lógica de adicionar ao carrinho
-    console.log("Adicionado ao carrinho:", product);
+    addItem(product);
   };
 
   // Filtrar e ordenar produtos localmente (opcional, pode ser feito no backend)
