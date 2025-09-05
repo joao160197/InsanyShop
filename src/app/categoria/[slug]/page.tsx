@@ -29,10 +29,12 @@ export default function CategoryPage() {
     sort: 'newest' | 'price-asc' | 'price-desc' | 'best-sellers';
     page: number;
     limit: number;
+    search: string;
   }>({
     sort: (searchParams?.get('sort') as any) || 'price-desc',
     page: parseInt(searchParams?.get('page') || '1'),
     limit: 6,
+    search: (searchParams?.get('search') || '').trim(),
   });
 
   // Set category name from slug and load products
@@ -54,6 +56,17 @@ export default function CategoryPage() {
       setCategoryName(slug);
     }
   }, [slug]);
+
+  // Sincroniza o termo de busca da URL com o estado de filtros
+  useEffect(() => {
+    const term = (searchParams.get('search') || '').trim();
+    setFilters(prev => {
+      if ((prev.search || '') !== term) {
+        return { ...prev, search: term, page: 1 };
+      }
+      return prev;
+    });
+  }, [searchParams]);
 
   // Texto descritivo por categoria (exibido à direita do título)
   const categoryTagline = useMemo(() => {
@@ -86,6 +99,7 @@ export default function CategoryPage() {
       
       const response = await fetchProducts({
         category: slug,
+        search: filters.search || undefined,
         sort: filters.sort,
         page: filters.page,
         limit: filters.limit
@@ -122,6 +136,7 @@ export default function CategoryPage() {
       const params = new URLSearchParams();
       if (filters.sort !== 'newest') params.set('sort', filters.sort);
       if (filters.page > 1) params.set('page', filters.page.toString());
+      if ((filters.search || '').trim()) params.set('search', filters.search.trim());
       
       const queryString = params.toString();
       const newUrl = queryString ? `?${queryString}` : window.location.pathname;

@@ -39,7 +39,7 @@ export function FeaturedCategories({ onCategorySelect }: FeaturedCategoriesProps
   if (isLoading) {
     return (
       <section className={styles.featuredCategories}>
-        <h2 className={styles.title}>Principais categorias</h2>
+        <h2 className={styles.title}>Principais Categorias</h2>
         <div className={styles.loading}>Carregando categorias...</div>
       </section>
     );
