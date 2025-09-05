@@ -27,14 +27,18 @@ export const metadata: Metadata = {
 
 
 
+
+// Only include test script in development
+const isDevelopment = process.env.NODE_ENV === 'development';
+
 export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-   <body className={`${inter.variable} font-sans`} suppressHydrationWarning={true}>
+    <html lang="pt-BR">
+      <body className={`${inter.variable} font-sans`} suppressHydrationWarning={true}>
         <Header />
         {children}
       </body>

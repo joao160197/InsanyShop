@@ -1,74 +1,113 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import { Cards } from "@/components/Cards";
 import { FilterBar } from "@/components/FilterBar";
-
-type Product = {
-  id: number;
-  name: string;
-  price: number;
-  image: string;
-  category: string;
-};
-
-// Dados de exemplo dos produtos
-const mockProducts: Product[] = [
-  {
-    id: 1,
-    name: "Roupas e Calçados",
-    price: 70.0,
-    image: "/image/image.png",
-    category: "t-shirts"
-  },
-  {
-    id: 2,
-    name: "Roupas e Calçados",
-    price: 89.9,
-    image: "/image/image.png",
-    category: "t-shirts"
-  },
-  {
-    id: 3,
-    name: "Roupas e Calçados",
-    price: 180.0,
-    image: "/image/image.png",
-    category: "pants"
-  },
-  {
-    id: 4,
-    name: "Roupas e calçados ",
-    price: 170.0,
-    image: "/image/image.png",
-    category: "pants"
-  },
-  {
-    id: 5,
-    name: "Roupas e Calçados",
-    price: 90.0,
-    image: "/image/image.png",
-    category: "shirts"
-  },
-  {
-    id: 6,
-    name: "Roupas e Calçados",
-    price: 120.0,
-    image: "/image/image.png",
-    category: "shirts"
-  },
-];
+import { Pagination } from "@/components/Pagination";
+import { FeaturedCategories } from "@/components/FeaturedCategories";
+import { fetchProducts } from "@/services/api";
+import type { Product } from "@/types/api";
+import styles from "./page.module.css";
 
 export default function Home() {
+  const [products, setProducts] = useState<Product[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalProducts, setTotalProducts] = useState(0);
+  
   const [filters, setFilters] = useState({
     category: "all",
-    sort: "newest"
+    sort: "newest" as 'newest' | 'price-asc' | 'price-desc' | 'best-sellers',
+    page: 1,
+    limit: 6, // 6 itens por página conforme solicitado
+    search: ""
   });
 
+  // Função para carregar os produtos
+  const loadProducts = useCallback(async () => {
+    try {
+      console.log('Carregando produtos com filtros:', {
+        category: filters.category,
+        page: filters.page,
+        limit: filters.limit,
+        sort: filters.sort,
+        search: filters.search
+      });
+      
+      setIsLoading(true);
+      setError(null);
+      
+      const response = await fetchProducts({
+        category: filters.category,
+        search: filters.search || undefined,
+        page: filters.page,
+        limit: filters.limit,
+        sort: filters.sort
+      });
+      
+      console.log('Resposta da API:', {
+        productsCount: response.products?.length,
+        pagination: response.pagination
+      });
+      
+      setProducts(response.products || []);
+      setTotalPages(response.pagination?.totalPages || 1);
+      setTotalProducts(response.pagination?.totalProducts || 0);
+    } catch (err) {
+      console.error('Erro ao carregar produtos:', err);
+      setError('Não foi possível carregar os produtos. Tente novamente mais tarde.');
+      setProducts([]);
+      setTotalPages(1);
+      setTotalProducts(0);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [filters]);
+
+  // Carrega os produtos quando o componente é montado ou quando os filtros mudam
+  useEffect(() => {
+    loadProducts();
+  }, [loadProducts]);
+
   const handleFilterChange = (filterType: string, value: string) => {
+    console.log('Filter changed:', { filterType, value });
     setFilters(prev => ({
       ...prev,
-      [filterType]: value
+      [filterType]: value,
+      // Reseta para a primeira página quando os filtros mudam
+      ...(filterType !== 'page' && { page: 1 })
     }));
+  };
+
+  // Handle category selection from FeaturedCategories
+  const handleCategorySelect = (categorySlug: string) => {
+    console.log('Category selected:', categorySlug);
+    handleFilterChange('category', categorySlug);
+    
+    // Scroll to the top of the product list
+    window.scrollTo({
+      top: 0,
+      behavior: 'smooth'
+    });
+  };
+
+  const handleSearch = (searchTerm: string) => {
+    setFilters(prev => ({
+      ...prev,
+      search: searchTerm,
+      page: 1
+    }));
+  };
+
+  const handlePageChange = (page: number) => {
+    setFilters(prev => ({
+      ...prev,
+      page
+    }));
+    
+    // Rolar para o topo da página quando mudar de página
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const handleAddToCart = (product: Product) => {
@@ -76,14 +115,9 @@ export default function Home() {
     console.log("Adicionado ao carrinho:", product);
   };
 
-  // Filtrar e ordenar produtos
+  // Filtrar e ordenar produtos localmente (opcional, pode ser feito no backend)
   const filteredProducts = useMemo(() => {
-    let result = [...mockProducts];
-
-    // Filtrar por categoria
-    if (filters.category !== "all") {
-      result = result.filter(product => product.category === filters.category);
-    }
+    let result = [...products];
 
     // Ordenar
     switch (filters.sort) {
@@ -92,20 +126,44 @@ export default function Home() {
       case "price-desc":
         return [...result].sort((a, b) => b.price - a.price);
       case "best-sellers":
-        // Implementar lógica de mais vendidos quando disponível
-        return result;
+        // Ordenar por avaliação (rating) quando disponível
+        return [...result].sort((a, b) => (b.rating || 0) - (a.rating || 0));
       default: // newest
         return result;
     }
-  }, [filters]);
+  }, [products, filters.sort]);
 
   return (
-    <main className="container">
-      <FilterBar onFilterChange={handleFilterChange} />
-      <Cards 
-        products={filteredProducts} 
-        onAddToCart={handleAddToCart} 
+    <main className={styles.container}>
+      <FilterBar 
+        onFilterChange={handleFilterChange} 
+        currentSort={filters.sort}
+        currentCategory={filters.category}
       />
+      
+      {isLoading ? (
+        <div className={styles.loading}>Carregando produtos...</div>
+      ) : error ? (
+        <div className={styles.errorMessage}>{error}</div>
+      ) : (
+        <>
+          <Cards 
+            products={filteredProducts} 
+            onAddToCart={handleAddToCart} 
+            categoryName={filters.category !== 'all' ? filters.category : undefined}
+          />
+          
+          {totalPages > 1 && (
+            <Pagination
+              currentPage={filters.page}
+              totalPages={totalPages}
+              onPageChange={handlePageChange}
+            />
+          )}
+          
+          <FeaturedCategories onCategorySelect={handleCategorySelect} />
+        </>
+      )}
     </main>
   );
 }

@@ -1,17 +1,35 @@
 .filterBar {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
+  flex-direction: column; // título embaixo
   max-width: 1200px;
   margin: 0 auto;
   padding: 0 2rem;
   margin-top: 20px;
 }
 
+.filterControls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
 .filterGroup {
   position: relative;
   min-width: 200px;
 }
+
+.pageTitle {
+    font-size: 2rem;
+    font-weight: bold;
+    letter-spacing: 1px;
+    color: #5D5D6D;
+    font-family: var(--font-inter), sans-serif;
+    font-style: normal;
+    line-height: 150%;
+    text-transform: uppercase;
+    color: #000000;
+}
+
 
 .select {
   width: 100%;
