@@ -28,7 +28,15 @@ export default function CartPage() {
           {items.map(item => (
             <div key={item.id} className={styles.card}>
               <div className={styles.imageWrapper}>
-                <Image src={item.image} alt={item.name} fill style={{ objectFit: 'cover' }} />
+                <Image 
+                  src={item.image} 
+                  alt={item.name} 
+                  fill 
+                  sizes="(max-width: 768px) 100vw, 33vw"
+                  quality={100}
+                  priority
+                  style={{ objectFit: 'cover' }} 
+                />
               </div>
               <div className={styles.info}>
                 <h3>{item.name}</h3>

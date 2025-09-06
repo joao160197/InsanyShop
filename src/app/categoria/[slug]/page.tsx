@@ -7,7 +7,7 @@ import { FilterBar } from '@/components/FilterBar';
 import { Pagination } from '@/components/Pagination';
 import { fetchProducts } from '@/services/api';
 import type { Product } from '@/types/api';
-import styles from './page.module.css';
+import styles from './page.module.scss';
 import { useCart } from '@/context/CartContext';
 
 export default function CategoryPage() {

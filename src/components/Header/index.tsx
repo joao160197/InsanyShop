@@ -127,10 +127,10 @@ export default function Header() {
           </form>
           <Link href="/cart">
             <button className={styles.button} onClick={() => setSearch("")} type="button" aria-label="Carrinho">
-              <div style={{ position: 'relative' }}>
+              <div className={styles.cartIconContainer}>
                 <FiShoppingBag size={24} color={"#737380"}/>
                 {count > 0 && (
-                  <span aria-label={`Itens no carrinho: ${count}`} style={{ position: 'absolute', top: -6, right: -6, background: '#DE3838', color: '#fff', borderRadius: '999px', minWidth: 18, height: 18, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', fontSize: 12, padding: '0 4px' }}>
+                  <span className={styles.cartBadge} aria-label={`Itens no carrinho: ${count}`}>
                     {count}
                   </span>
                 )}

@@ -7,7 +7,6 @@
   margin: 0 auto;
 }
 
-
 .headerTop {
   display: flex;
   align-items: center;
@@ -25,25 +24,18 @@
   text-align: center;
   vertical-align: middle;
   color: #737380;
-  
 }
-
 
 .categoryName {
   font-family: var(--font-inter), sans-serif;
-  font-weight: 400;
+  font-weight: 600;
   font-style: normal;
   font-size: 14px;
-  font-weight:bold;
   line-height: 22px;
   letter-spacing: 0%;
   text-align: center;
   vertical-align: middle;
-  
- }
- 
-
-
+}
 
 .headerSection {
   display: flex;
@@ -56,14 +48,13 @@
 }
 
 .filterBarContainer {
-  margin-right: 95px;
+  margin-right: 90px;
 }
 
 .pageTitle {
   font-size: 2rem;
   font-weight: bold;
   letter-spacing: 1px;
-  color: #5D5D6D;
   font-family: var(--font-inter), sans-serif;
   font-style: normal;
   line-height: 150%;
@@ -82,4 +73,27 @@
   color: #000000;
 }
 
+.loadingContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 300px;
+  text-align: center;
+  padding: 2rem;
+}
 
+.loadingSpinner {
+  width: 50px;
+  height: 50px;
+  border: 5px solid #f3f3f3;
+  border-top: 5px solid #000000;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 1rem;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
