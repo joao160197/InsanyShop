@@ -2,71 +2,86 @@
 
 import { useCart } from "@/context/CartContext";
 import Image from "next/image";
-import Link from "next/link";
+import { FaTrash } from "react-icons/fa";
+import styles from "./CartPage.module.scss";
 
 export default function CartPage() {
-  const { items, removeItem, setQuantity, clearCart, subtotal, shipping, total } = useCart();
+  const { items, removeItem, setQuantity,subtotal, shipping, total } = useCart();
 
   if (items.length === 0) {
     return (
-      <main className="container" style={{ padding: 24 }}>
-        <h1 style={{ fontSize: 24, marginBottom: 12 }}>Seu carrinho</h1>
+      <main className={styles.container}>
+        <h1 className={styles.title}>Seu carrinho</h1>
         <p>Seu carrinho está vazio.</p>
-        <Link href="/" style={{ color: "#115D8C", display: 'inline-block', marginTop: 12 }}>Voltar às compras</Link>
+        <a href="/" className={styles.backLink}>Voltar às compras</a>
       </main>
     );
   }
 
   return (
-    <main className="container" style={{ padding: 24 }}>
-      <h1 style={{ fontSize: 24, marginBottom: 16 }}>Seu carrinho</h1>
-      <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: 24 }}>
-        <section style={{ display: 'grid', gap: 12 }}>
+    <main className={styles.container}>
+      <h1 className={styles.title}>Seu carrinho</h1>
+
+      <div className={styles.grid}>
+        {/* Lista de itens */}
+        <section className={styles.items}>
           {items.map(item => (
-            <div key={item.id} style={{ display: 'grid', gridTemplateColumns: '80px 1fr auto', gap: 12, alignItems: 'center', padding: 12, border: '1px solid #eee', borderRadius: 8 }}>
-              <div style={{ position: 'relative', width: 80, height: 80, borderRadius: 8, overflow: 'hidden' }}>
+            <div key={item.id} className={styles.card}>
+              <div className={styles.imageWrapper}>
                 <Image src={item.image} alt={item.name} fill style={{ objectFit: 'cover' }} />
               </div>
-              <div>
-                <div style={{ fontWeight: 600 }}>{item.name}</div>
-                <div style={{ color: '#666', fontSize: 14 }}>{item.brand}</div>
-                <div style={{ marginTop: 8, fontWeight: 600 }}>
-                  {item.price.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
+              <div className={styles.info}>
+                <h3>{item.name}</h3>
+                <p className={styles.brand}>{item.brand}</p>
+                <p className={styles.description}>
+                  Aqui vem um texto descritivo do produto, esta caixa de texto servirá
+                  apenas de exemplo para simular algum texto que venha a ser inserido.
+                </p>
+                <div className={styles.actions}>
+                  <select
+                    value={item.quantity}
+                    onChange={(e) => setQuantity(item.id, Number(e.target.value))}
+                  >
+                    {[1, 2, 3, 4, 5].map(n => (
+                      <option key={n} value={n}>{n}</option>
+                    ))}
+                  </select>
+                  <button onClick={() => removeItem(item.id)} className={styles.trash}>
+                    <FaTrash />
+                  </button>
                 </div>
               </div>
-              <div style={{ display: 'grid', gap: 8, justifyItems: 'end' }}>
-                <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-                  <button onClick={() => setQuantity(item.id, Math.max(0, item.quantity - 1))} style={{ padding: '4px 8px' }}>-</button>
-                  <span>{item.quantity}</span>
-                  <button onClick={() => setQuantity(item.id, item.quantity + 1)} style={{ padding: '4px 8px' }}>+</button>
-                </div>
-                <button onClick={() => removeItem(item.id)} style={{ color: '#a00' }}>Remover</button>
+              <div className={styles.price}>
+                {item.price.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
               </div>
             </div>
           ))}
         </section>
 
-        <aside style={{ border: '1px solid #eee', borderRadius: 8, padding: 16, height: 'fit-content', position: 'sticky', top: 24 }}>
-          <h2 style={{ fontSize: 18, marginBottom: 12 }}>Resumo</h2>
-          <div style={{ display: 'grid', gap: 8 }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-              <span>Subtotal</span>
-              <strong>{subtotal.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</strong>
-            </div>
-            <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-              <span>Frete</span>
-              <strong>{shipping.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</strong>
-            </div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', borderTop: '1px solid #eee', paddingTop: 8 }}>
-              <span>Total</span>
-              <strong>{total.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</strong>
-            </div>
-            <button style={{ marginTop: 12, padding: '12px 16px', background: '#115D8C', color: '#fff', borderRadius: 8, border: 0, cursor: 'pointer' }}>
-              Finalizar compra
-            </button>
-            <button onClick={clearCart} style={{ marginTop: 8, padding: '8px 12px', borderRadius: 8, border: '1px solid #ccc', cursor: 'pointer' }}>
-              Limpar carrinho
-            </button>
+        {/* Resumo */}
+        <aside className={styles.summary}>
+          <h2>Resumo do pedido</h2>
+          <div className={styles.row}>
+            <span>Subtotal de produtos</span>
+            <strong>{subtotal.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</strong>
+          </div>
+          <div className={styles.row}>
+            <span>Entrega</span>
+            <strong>{shipping.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</strong>
+          </div>
+          <div className={`${styles.row} ${styles.total}`}>
+            <span>Total</span>
+            <strong>{total.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</strong>
+          </div>
+
+          <button className={styles.buyBtn}>Finalizar a compra</button>
+         
+
+          <div className={styles.links}>
+            <a href="#">Ajuda</a>
+            <a href="#">Reembolsos</a>
+            <a href="#">Entregas e frete</a>
+            <a href="#">Trocas e devoluções</a>
           </div>
         </aside>
       </div>

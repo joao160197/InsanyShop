@@ -1,0 +1,155 @@
+.container {
+    padding: 24px;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+  
+  .title {
+    font-size: 24px;
+    margin-bottom: 20px;
+    font-weight: 600;
+  }
+  
+  .backLink {
+    color: #115d8c;
+    display: inline-block;
+    margin-top: 12px;
+  }
+  
+  .grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 24px;
+  }
+  
+  .items {
+    display: grid;
+    gap: 16px;
+  }
+  
+  .card {
+    display: grid;
+    grid-template-columns: 120px 1fr auto;
+    gap: 16px;
+    border: 1px solid #eee;
+    border-radius: 8px;
+    padding: 16px;
+    background: #fff;
+    align-items: center;
+  }
+  
+  .imageWrapper {
+    position: relative;
+    width: 120px;
+    height: 120px;
+    border-radius: 8px;
+    overflow: hidden;
+  }
+  
+  .info {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  
+    h3 {
+      font-weight: 600;
+    }
+  
+    .brand {
+      color: #666;
+      font-size: 14px;
+    }
+  
+    .description {
+      font-size: 13px;
+      color: #999;
+    }
+  }
+  
+  .actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  
+    select {
+      padding: 6px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+    }
+  
+    .trash {
+      background: none;
+      border: none;
+      color: #d00;
+      font-size: 16px;
+      cursor: pointer;
+    }
+  }
+  
+  .price {
+    font-weight: 600;
+    font-size: 16px;
+  }
+  
+  .summary {
+    border: 1px solid #eee;
+    border-radius: 8px;
+    padding: 20px;
+    background: #fff;
+    height: fit-content;
+    position: sticky;
+    top: 24px;
+  
+    h2 {
+      font-size: 18px;
+      margin-bottom: 16px;
+    }
+  
+    .row {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 8px;
+    }
+  
+    .total {
+      border-top: 1px solid #eee;
+      padding-top: 8px;
+      font-size: 16px;
+    }
+  }
+  
+  .buyBtn {
+    margin-top: 16px;
+    padding: 12px 16px;
+    width: 100%;
+    background: #00a859;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  
+  .clearBtn {
+    margin-top: 10px;
+    padding: 10px;
+    width: 100%;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    background: #fafafa;
+    cursor: pointer;
+  }
+  
+  .links {
+    margin-top: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  
+    a {
+      font-size: 13px;
+      color: #115d8c;
+      text-decoration: none;
+    }
+  }
+  

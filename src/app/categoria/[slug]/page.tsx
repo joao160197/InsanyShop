@@ -22,7 +22,6 @@ export default function CategoryPage() {
   const [totalProducts, setTotalProducts] = useState(0);
   const [categoryName, setCategoryName] = useState('');
   
-  // Get the slug from params
   const slug = Array.isArray(params?.slug) ? params.slug[0] : params?.slug || '';
   
   const [filters, setFilters] = useState<{
@@ -37,7 +36,6 @@ export default function CategoryPage() {
     search: (searchParams?.get('search') || '').trim(),
   });
 
-  // Set category name from slug and load products
   useEffect(() => {
     if (!slug) {
       setError('Categoria não encontrada');
@@ -57,7 +55,6 @@ export default function CategoryPage() {
     }
   }, [slug]);
 
-  // Sincroniza o termo de busca da URL com o estado de filtros
   useEffect(() => {
     const term = (searchParams.get('search') || '').trim();
     setFilters(prev => {
@@ -68,7 +65,6 @@ export default function CategoryPage() {
     });
   }, [searchParams]);
 
-  // Texto descritivo por categoria (exibido à direita do título)
   const categoryTagline = useMemo(() => {
     const key = (slug || '').toString().toLowerCase();
     const map: Record<string, string> = {
@@ -85,7 +81,6 @@ export default function CategoryPage() {
     return map[key] || '';
   }, [slug]);
 
-  // Carrega os produtos da categoria
   const loadProducts = useCallback(async () => {
     if (!slug) {
       setError('Categoria inválida');
@@ -127,12 +122,10 @@ export default function CategoryPage() {
     }
   }, [slug, filters.sort, filters.page, filters.limit]);
 
-  // Atualiza os produtos quando os filtros mudam
   useEffect(() => {
     if (slug) {
       loadProducts();
       
-      // Atualiza a URL com os parâmetros atuais
       const params = new URLSearchParams();
       if (filters.sort !== 'newest') params.set('sort', filters.sort);
       if (filters.page > 1) params.set('page', filters.page.toString());
@@ -144,7 +137,6 @@ export default function CategoryPage() {
     }
   }, [loadProducts, slug]);
 
-  // Garante que o sort esteja sempre em uma opção de preço nesta página
   useEffect(() => {
     if (filters.sort !== 'price-asc' && filters.sort !== 'price-desc') {
       setFilters(prev => ({ ...prev, sort: 'price-desc' }));
@@ -153,7 +145,6 @@ export default function CategoryPage() {
 
   const handleFilterChange = (filterType: string, value: string) => {
     setFilters(prev => {
-      // Se estiver mudando o tipo de ordenação, volta para a primeira página
       if (filterType === 'sort') {
         return {
           ...prev,
@@ -168,21 +159,10 @@ export default function CategoryPage() {
     });
   };
 
-  const handlePageChange = (page: number) => {
-    setFilters(prev => ({
-      ...prev,
-      page
-    }));
-    
-    // Rolar para o topo quando mudar de página
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  };
-
   const handleAddToCart = (product: Product) => {
     addItem(product);
   };
 
-  // Ordenar produtos localmente (opcional, pode ser feito no backend)
   const sortedProducts = useMemo(() => {
     let result = [...products];
 
@@ -193,12 +173,11 @@ export default function CategoryPage() {
         return [...result].sort((a, b) => b.price - a.price);
       case 'best-sellers':
         return [...result].sort((a, b) => (b.rating || 0) - (a.rating || 0));
-      default: // newest
+      default:
         return result;
     }
   }, [products, filters.sort]);
 
-  // Se estiver carregando, mostra um indicador de carregamento
   if (isLoading) {
     return (
       <main className="container">
@@ -211,10 +190,9 @@ export default function CategoryPage() {
     );
   }
 
-  // Se houver erro, mostra a mensagem de erro
   if (error) {
     return (
-      <main className="container">
+      <main className={styles.container}>
         <h1 className={styles.pageTitle}>{categoryName || 'Categoria'}</h1>
         <div className={styles.errorMessage}>
           <p>{error}</p>
@@ -234,7 +212,6 @@ export default function CategoryPage() {
     );
   }
 
-  // Se não houver produtos, mostra uma mensagem
   if (sortedProducts.length === 0) {
     return (
       <main className="container">
@@ -251,42 +228,54 @@ export default function CategoryPage() {
 
   return (
     <main className={styles.container}>
-      <div className={styles.breadcrumb}>Produtos / {categoryName || 'Categoria'}</div>
+      <div className={styles.contentWrapper}>
 
-      <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', gap: 16, marginBottom: 8 }}>
-        <h1 className={styles.pageTitle} style={{ marginBottom: 0 }}>{categoryName || 'Categoria'}</h1>
-        {categoryTagline && (
-          <div style={{ color: '#737380' }}>{categoryTagline}</div>
+        {/* Breadcrumb e FilterBar lado a lado */}
+        <div className={styles.headerTop}>
+          <div className={styles.breadcrumb}>
+            Produtos / <span className={styles.categoryName}>{categoryName || 'Categoria'}</span>
+          </div>
+
+        <div className={styles.filterBarContainer}>
+        <FilterBar 
+           className={styles.filterBar}
+            currentSort={filters.sort}
+            currentCategory={slug || 'all'}
+            onFilterChange={handleFilterChange}
+            hideCategory
+            priceOnly
+            hideTitle
+          />
+        </div>
+        </div>
+
+        {/* Título e tagline */}
+        <div className={styles.headerSection}>
+          <h1 className={styles.pageTitle}>{categoryName || 'Categoria'}</h1>
+          {categoryTagline && (
+            <div className={styles.subtitle}>{categoryTagline}</div>
+          )}
+        </div>
+
+        <Cards 
+          products={sortedProducts} 
+          categoryName={categoryName}
+          onAddToCart={handleAddToCart}
+        />
+        
+        {totalPages > 1 && (
+          <div className={styles.paginationContainer}>
+            <Pagination
+              currentPage={filters.page}
+              totalPages={totalPages}
+              onPageChange={(page) => handleFilterChange('page', page.toString())}
+            />
+            <p className={styles.totalProducts}>
+              Mostrando {sortedProducts.length} de {totalProducts} produtos
+            </p>
+          </div>
         )}
       </div>
-
-      <FilterBar 
-        currentSort={filters.sort}
-        currentCategory={slug || 'all'}
-        onFilterChange={handleFilterChange}
-        hideCategory
-        priceOnly
-        hideTitle
-      />
-
-      <Cards 
-        products={sortedProducts} 
-        categoryName={categoryName}
-        onAddToCart={(product) => addItem(product)}
-      />
-      
-      {totalPages > 1 && (
-        <div className={styles.paginationContainer}>
-          <Pagination
-            currentPage={filters.page}
-            totalPages={totalPages}
-            onPageChange={(page) => handleFilterChange('page', page.toString())}
-          />
-          <p className={styles.totalProducts}>
-            Mostrando {sortedProducts.length} de {totalProducts} produtos
-          </p>
-        </div>
-      )}
     </main>
   );
 }

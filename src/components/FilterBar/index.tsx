@@ -29,7 +29,7 @@ export function FilterBar({ onFilterChange, currentSort, currentCategory, classN
 
   const sortOptions: OptionType[] = priceOnly
     ? [
-        { value: 'price-desc', label: 'Preço: Maior - menor' },
+        { value: 'price-desc', label: 'Organizar por' },
         { value: 'price-asc', label: 'Preço: Menor - maior' },
       ]
     : [
