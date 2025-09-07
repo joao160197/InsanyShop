@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback, useMemo } from "react";
+import { useState, useEffect, useMemo, useCallback } from "react";
 import { Cards } from "@/components/Cards/index";
 import { FilterBar } from "@/components/FilterBar";
 import { Pagination } from "@/components/Pagination";
@@ -8,7 +8,7 @@ import { FeaturedCategories } from "@/components/FeaturedCategories";
 import { fetchProducts } from "@/services/api";
 import type { Product } from "@/types/api";
 import styles from "./page.module.css";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams, useRouter } from "next/navigation";
 import { useCart } from "@/context/CartContext";
 
 export default function Home() {
@@ -114,14 +114,6 @@ export default function Home() {
     });
   };
 
-  const handleSearch = (searchTerm: string) => {
-    setFilters(prev => ({
-      ...prev,
-      search: searchTerm,
-      page: 1
-    }));
-  };
-
   const handlePageChange = (page: number) => {
     setFilters(prev => ({
       ...prev,
@@ -138,9 +130,8 @@ export default function Home() {
 
  
   const filteredProducts = useMemo(() => {
-    let result = [...products];
+    const result = [...products];
 
- 
     switch (filters.sort) {
       case "price-asc":
         return [...result].sort((a, b) => a.price - b.price);

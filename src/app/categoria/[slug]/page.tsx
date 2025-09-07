@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback, useMemo } from 'react';
-import { useSearchParams, useParams, useRouter } from 'next/navigation';
+import { useSearchParams, useParams } from 'next/navigation';
 import Link from 'next/link';
 import { Cards } from '@/components/Cards';
 import { FilterBar } from '@/components/FilterBar';
@@ -146,17 +146,7 @@ export default function CategoryPage() {
     }
   }, [filters.sort]);
 
-  const handleSortChange = useCallback((value: SortOption) => {
-    setFilters(prev => ({
-      ...prev,
-      sort: value,
-      page: 1
-    }));
-  }, []);
-
-  const handlePageChange = useCallback((page: number) => {
-    setFilters(prev => ({ ...prev, page }));
-  }, []);
+  // Sort and pagination handlers are now handled by handleFilterChange
 
   const handleFilterChange = (filterType: string, value: string) => {
     setFilters(prev => ({
@@ -171,7 +161,7 @@ export default function CategoryPage() {
   };
 
   const sortedProducts = useMemo(() => {
-    let result = [...products];
+    const result = [...products];
 
     switch (filters.sort) {
       case 'price-asc':
@@ -225,9 +215,9 @@ export default function CategoryPage() {
         <h1 className={styles.pageTitle}>{categoryName || 'Categoria'}</h1>
         <div className={styles.emptyState}>
           <p>Nenhum produto encontrado nesta categoria.</p>
-          <a href="/" className={styles.backButton}>
+          <Link href="/" className={styles.backButton}>
             Voltar para a página inicial
-          </a>
+          </Link>
         </div>
       </main>
     );

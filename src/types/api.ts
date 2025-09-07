@@ -1,6 +1,34 @@
-interface ImageObject {
+interface ImageObject extends Record<string, unknown> {
   url: string;
-  [key: string]: any;
+  name?: string;
+  alt?: string;
+  width?: number;
+  height?: number;
+}
+
+export interface CategoryObject {
+  name?: unknown;
+  [key: string]: unknown;
+}
+
+export interface SearchProductResponse {
+  id?: number | string;
+  name?: string;
+  title?: string;
+  description?: string;
+  details?: string;
+  desc?: string;
+  price?: number | string;
+  value?: number | string;
+  amount?: number | string;
+  image?: string | ImageObject;
+  thumbnail?: string;
+  images?: Array<string | ImageObject>;
+  category?: string;
+  stock?: number;
+  rating?: number;
+  brand?: string;
+  [key: string]: unknown;
 }
 
 export interface Product {
