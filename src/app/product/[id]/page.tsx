@@ -41,16 +41,14 @@ export default function ProductPage() {
   if (!product) return <main className={styles.container}>Produto não encontrado.</main>;
 
   
-  const priceValue = Number((product as any)?.price ?? 0);
-  const stockValue = Number((product as any)?.stock ?? 0);
-  const descriptionText = (product as any)?.description ?? '';
-  const rawImage: any = (product as any)?.image;
-  const resolvedImageSrc: string =
-    typeof rawImage === 'string' && rawImage.trim()
-      ? rawImage
-      : (rawImage && typeof rawImage === 'object' && typeof rawImage.url === 'string' && rawImage.url.trim())
-        ? rawImage.url
-        : '/image/image.png';
+  const priceValue = typeof product.price === 'number' ? product.price : 0;
+  const stockValue = typeof product.stock === 'number' ? product.stock : 0;
+  const descriptionText = typeof product.description === 'string' ? product.description : '';
+  const resolvedImageSrc = typeof product.image === 'string' 
+    ? product.image 
+    : typeof product.image === 'object' && product.image && 'url' in product.image 
+      ? product.image.url 
+      : '/image/image.png';
 
   return (
     <main className={styles.container}>

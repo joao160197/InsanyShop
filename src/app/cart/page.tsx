@@ -3,6 +3,7 @@
 import { useCart } from "@/context/CartContext";
 import Image from "next/image";
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { HiOutlineTrash } from "react-icons/hi2";
 import { TbArrowBackUp } from "react-icons/tb";
 import styles from "./CartPage.module.scss";
@@ -16,7 +17,7 @@ export default function CartPage() {
       <main className={styles.containerEmpty}>
         <h1 className={styles.title}>Seu carrinho</h1>
         <p className={styles.emptyText}>Seu carrinho está vazio.</p>
-        <a href="/" className={styles.backLink}>Voltar às compras</a>
+        <Link href="/" className={styles.backLink}>Voltar às compras</Link>
       </main>
     );
   }
@@ -45,7 +46,7 @@ export default function CartPage() {
             <div key={item.id} className={styles.card}>
               <div className={styles.imagePanel}>
                 <Image
-                  src={item.image}
+                  src={typeof item.image === 'string' ? item.image : item.image.url}
                   alt={item.name}
                   fill
                   quality={100}

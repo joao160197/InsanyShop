@@ -1,7 +1,8 @@
 'use client';
 
 import { useState, useEffect, useCallback, useMemo } from 'react';
-import { useSearchParams, useParams } from 'next/navigation';
+import { useSearchParams, useParams, useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { Cards } from '@/components/Cards';
 import { FilterBar } from '@/components/FilterBar';
 import { Pagination } from '@/components/Pagination';
@@ -24,13 +25,15 @@ export default function CategoryPage() {
   
   const slug = Array.isArray(params?.slug) ? params.slug[0] : params?.slug || '';
   
+  type SortOption = 'newest' | 'price-asc' | 'price-desc' | 'best-sellers';
+  
   const [filters, setFilters] = useState<{
-    sort: 'newest' | 'price-asc' | 'price-desc' | 'best-sellers';
+    sort: SortOption;
     page: number;
     limit: number;
     search: string;
   }>({
-    sort: (searchParams?.get('sort') as any) || 'price-desc',
+    sort: (searchParams?.get('sort') as SortOption) || 'price-desc',
     page: parseInt(searchParams?.get('page') || '1'),
     limit: 6,
     search: (searchParams?.get('search') || '').trim(),
@@ -120,7 +123,7 @@ export default function CategoryPage() {
     } finally {
       setIsLoading(false);
     }
-  }, [slug, filters.sort, filters.page, filters.limit]);
+  }, [slug, filters.search, filters.sort, filters.page, filters.limit]);
 
   useEffect(() => {
     if (slug) {
@@ -135,7 +138,7 @@ export default function CategoryPage() {
       const newUrl = queryString ? `?${queryString}` : window.location.pathname;
       window.history.replaceState(null, '', newUrl);
     }
-  }, [loadProducts, slug]);
+  }, [loadProducts, slug, filters.sort, filters.page, filters.search]);
 
   useEffect(() => {
     if (filters.sort !== 'price-asc' && filters.sort !== 'price-desc') {
@@ -143,20 +146,24 @@ export default function CategoryPage() {
     }
   }, [filters.sort]);
 
+  const handleSortChange = useCallback((value: SortOption) => {
+    setFilters(prev => ({
+      ...prev,
+      sort: value,
+      page: 1
+    }));
+  }, []);
+
+  const handlePageChange = useCallback((page: number) => {
+    setFilters(prev => ({ ...prev, page }));
+  }, []);
+
   const handleFilterChange = (filterType: string, value: string) => {
-    setFilters(prev => {
-      if (filterType === 'sort') {
-        return {
-          ...prev,
-          sort: value as any,
-          page: 1
-        };
-      }
-      return {
-        ...prev,
-        [filterType]: filterType === 'page' ? parseInt(value) : value
-      };
-    });
+    setFilters(prev => ({
+      ...prev,
+      [filterType]: filterType === 'page' ? parseInt(value) : value,
+      ...(filterType === 'sort' ? { page: 1 } : {})
+    }));
   };
 
   const handleAddToCart = (product: Product) => {
@@ -203,9 +210,9 @@ export default function CategoryPage() {
             >
               Tentar novamente
             </button>
-            <a href="/" className={styles.backButton}>
+            <Link href="/" className={styles.backButton}>
               Voltar para a página inicial
-            </a>
+            </Link>
           </div>
         </div>
       </main>

@@ -1,9 +1,14 @@
+interface ImageObject {
+  url: string;
+  [key: string]: any;
+}
+
 export interface Product {
   id: number;
   name: string;
   description: string;
   price: number;
-  image: string;
+  image: string | ImageObject;
   category: string;
   stock: number;
   rating: number;

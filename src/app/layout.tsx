@@ -3,13 +3,13 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import ClientLayout from "./ClientLayout";
 
+// Load fonts
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
 });
 
 import { Inter } from 'next/font/google';
-
 const inter = Inter({ 
   subsets: ['latin'],
   variable: '--font-inter',
@@ -24,9 +24,6 @@ export const metadata: Metadata = {
   title: "InsanyShop",
   description: "InsanyShop",
 };
-
-
-const isDevelopment = process.env.NODE_ENV === 'development';
 
 export default function RootLayout({
   children,

@@ -15,9 +15,9 @@ type CardsProps = {
 
 export function Cards({ products, onAddToCart, categoryName }: CardsProps) {
   const getProductImage = (product: Product) => {
-    const raw = (product as any)?.image;
+    const raw = product.image;
     if (typeof raw === 'string' && raw.trim()) return raw;
-    if (raw && typeof raw === 'object' && typeof raw.url === 'string' && raw.url.trim()) {
+    if (raw && typeof raw === 'object' && 'url' in raw && typeof raw.url === 'string' && raw.url.trim()) {
       return raw.url;
     }
     return '/image/image.png';
