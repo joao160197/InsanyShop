@@ -13,9 +13,9 @@ export default function CartPage() {
 
   if (items.length === 0) {
     return (
-      <main className={styles.container}>
+      <main className={styles.containerEmpty}>
         <h1 className={styles.title}>Seu carrinho</h1>
-        <p>Seu carrinho está vazio.</p>
+        <p className={styles.emptyText}>Seu carrinho está vazio.</p>
         <a href="/" className={styles.backLink}>Voltar às compras</a>
       </main>
     );

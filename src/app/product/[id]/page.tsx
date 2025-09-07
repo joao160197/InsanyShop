@@ -40,7 +40,7 @@ export default function ProductPage() {
   if (error) return <main className={styles.container}><p>{error}</p></main>;
   if (!product) return <main className={styles.container}>Produto não encontrado.</main>;
 
-  // Normaliza campos potencialmente divergentes vindos da API
+  
   const priceValue = Number((product as any)?.price ?? 0);
   const stockValue = Number((product as any)?.stock ?? 0);
   const descriptionText = (product as any)?.description ?? '';
@@ -50,7 +50,7 @@ export default function ProductPage() {
       ? rawImage
       : (rawImage && typeof rawImage === 'object' && typeof rawImage.url === 'string' && rawImage.url.trim())
         ? rawImage.url
-        : '/image/image.png'; // placeholder local em public/image/
+        : '/image/image.png';
 
   return (
     <main className={styles.container}>

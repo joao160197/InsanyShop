@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback, useMemo } from "react";
-import { Cards } from "@/components/Cards";
+import { Cards } from "@/components/Cards/index";
 import { FilterBar } from "@/components/FilterBar";
 import { Pagination } from "@/components/Pagination";
 import { FeaturedCategories } from "@/components/FeaturedCategories";
@@ -25,11 +25,11 @@ export default function Home() {
     category: "all",
     sort: "newest" as 'newest' | 'price-asc' | 'price-desc' | 'best-sellers',
     page: 1,
-    limit: 6, // 6 itens por página conforme solicitado
+    limit: 6, 
     search: ""
   });
 
-  // Função para carregar os produtos
+ 
   const loadProducts = useCallback(async () => {
     try {
       console.log('Carregando produtos com filtros:', {
@@ -70,16 +70,16 @@ export default function Home() {
     }
   }, [filters]);
 
-  // Carrega os produtos quando o componente é montado ou quando os filtros mudam
+ 
   useEffect(() => {
     loadProducts();
   }, [loadProducts]);
 
-  // Sincroniza o termo de busca da URL com o estado de filtros
+  
   useEffect(() => {
     const term = (searchParams.get('search') || '').trim();
     setFilters(prev => {
-      // Se o termo da URL é diferente do estado atual, atualiza e volta para página 1
+      
       if ((prev.search || '') !== term) {
         return { ...prev, search: term, page: 1 };
       }
@@ -90,24 +90,24 @@ export default function Home() {
   const handleFilterChange = (filterType: string, value: string) => {
     console.log('Filter changed:', { filterType, value });
     if (filterType === 'category' && value && value !== 'all') {
-      // Navega para a página de categoria dedicada
+      
       router.push(`/categoria/${value}`);
       return;
     }
     setFilters(prev => ({
       ...prev,
       [filterType]: value,
-      // Reseta para a primeira página quando os filtros mudam
+     
       ...(filterType !== 'page' && { page: 1 })
     }));
   };
 
-  // Handle category selection from FeaturedCategories
+  
   const handleCategorySelect = (categorySlug: string) => {
     console.log('Category selected:', categorySlug);
     handleFilterChange('category', categorySlug);
     
-    // Scroll to the top of the product list
+    
     window.scrollTo({
       top: 0,
       behavior: 'smooth'
@@ -128,7 +128,7 @@ export default function Home() {
       page
     }));
     
-    // Rolar para o topo da página quando mudar de página
+
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
@@ -136,18 +136,18 @@ export default function Home() {
     addItem(product);
   };
 
-  // Filtrar e ordenar produtos localmente (opcional, pode ser feito no backend)
+ 
   const filteredProducts = useMemo(() => {
     let result = [...products];
 
-    // Ordenar
+ 
     switch (filters.sort) {
       case "price-asc":
         return [...result].sort((a, b) => a.price - b.price);
       case "price-desc":
         return [...result].sort((a, b) => b.price - a.price);
       case "best-sellers":
-        // Ordenar por avaliação (rating) quando disponível
+       
         return [...result].sort((a, b) => (b.rating || 0) - (a.rating || 0));
       default: // newest
         return result;
@@ -162,17 +162,18 @@ export default function Home() {
         currentCategory={filters.category}
       />
       
-      {isLoading ? (
-        <div className={styles.loading}>Carregando produtos...</div>
-      ) : error ? (
+      {error ? (
         <div className={styles.errorMessage}>{error}</div>
       ) : (
         <>
-          <Cards 
-            products={filteredProducts} 
-            onAddToCart={handleAddToCart} 
-            categoryName={filters.category !== 'all' ? filters.category : undefined}
-          />
+          {isLoading && <div className={styles.loading}>Carregando produtos...</div>}
+          <div style={{ display: isLoading ? 'none' : 'block' }}>
+            <Cards 
+              products={filteredProducts} 
+              onAddToCart={handleAddToCart} 
+              categoryName={filters.category !== 'all' ? filters.category : undefined}
+            />
+          </div>
           
           {totalPages > 1 && (
             <Pagination

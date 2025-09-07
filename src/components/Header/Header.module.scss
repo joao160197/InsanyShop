@@ -1,3 +1,8 @@
+
+$breakpoint-mobile: 480px;
+$breakpoint-tablet: 768px;
+$breakpoint-desktop: 1024px;
+
 .header {
   position: fixed;
   top: 0;
@@ -10,32 +15,104 @@
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 
   .container {
-    max-width: 100%;
+    width: 100%;
+    max-width: 1200px;
     margin: 0 auto;
-    padding: 0 1rem;
+    padding: 0 0.75rem;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    flex-wrap: wrap;
-    gap: 1rem;
+    flex-wrap: nowrap;
+    gap: 0.5rem;
+    
+    @media (min-width: $breakpoint-tablet) {
+      padding: 0 1.5rem;
+      gap: 1rem;
+    }
+  }
+
+ 
+  @media (max-width: $breakpoint-mobile) {
+    .container {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      grid-template-areas:
+        "title cart"
+        "search search";
+      align-items: center;
+      gap: 6px 8px;
+      padding: 0 0.75rem;
+    }
+    .leftSection {
+      grid-area: title;
+      justify-content: center;
+      width: 100%;
+      .Title {
+        text-align: center;
+        margin: 0 auto;
+      }
+    }
+    .rightSection {
+      display: contents; 
+      width: 80%;
+    }
+    .rightSection .button {
+      grid-area: cart;
+      justify-self: end;
+    }
+    .rightSection .searchContainer,
+    .searchContainer {
+      grid-area: search;
+      max-width: 320px; 
+      width: 80%;
+      margin: 0 auto; 
+    }
+    .rightSection .button {
+      margin-right: 0; 
+      min-width: 44px; 
+    }
   }
 
   .leftSection {
     display: flex;
     align-items: center;
     gap: 1rem;
+    order: 1;
+    flex: 0 0 auto; 
+    min-width: auto;
+    
+    @media (min-width: $breakpoint-tablet) {
+      flex: 0 0 auto;
+      order: 1;
+    }
   }
 
   .Title {
-    font-size: 1.25rem;
+    font-size: 0.625rem; 
     font-weight: 600;
-    letter-spacing: 0.5px;
+    letter-spacing: 0.2px;
     color: #5D5D6D;
     font-family: var(--font-inter), sans-serif;
-    line-height: 1.5;
+    line-height: 1.4;
     text-transform: uppercase;
     white-space: nowrap;
     transition: transform 0.2s;
+    overflow: visible;
+    text-overflow: clip;
+    max-width: none;
+    padding-right: 0;
+    
+    @media (min-width: $breakpoint-mobile) {
+      font-size: 0.75rem; 
+    }
+    
+    @media (min-width: $breakpoint-tablet) {
+      font-size: 1rem; 
+    }
+    
+    &:hover {
+      transform: scale(1.02);
+    }
   }
 
   a {
@@ -47,10 +124,19 @@
   .rightSection {
     display: flex;
     align-items: center;
-    gap: 0.75rem;
-    width: 100%;
-    max-width: 100%;
-    order: 3;
+    gap: 0.5rem;
+    flex-shrink: 0;
+    
+    @media (min-width: $breakpoint-tablet) {
+      flex: 1;
+      justify-content: flex-end;
+      max-width: 600px;
+      gap: 0.75rem;
+    }
+    
+    @media (min-width: $breakpoint-desktop) {
+      max-width: 800px;
+    }
   }
 
   .searchContainer {
@@ -61,10 +147,22 @@
     border-radius: 8px;
     overflow: hidden;
     width: 100%;
-    max-width: 100%;
-    height: 40px;
+    max-width: calc(100% - 44px); 
+    height: 36px;
     background: #F3F7FF;
-    flex: 1;
+    min-width: 0;
+    margin-right: 4px; 
+    
+    @media (min-width: $breakpoint-tablet) {
+      max-width: 400px;
+      height: 40px;
+      margin-left: auto;
+      margin-right: 0;
+    }
+    
+    @media (min-width: $breakpoint-desktop) {
+      max-width: 500px;
+    }
   }
   
   .input {
@@ -90,16 +188,31 @@
     align-items: center;
     justify-content: center;
     width: 40px;
-    height: 100%;
+    height: 40px;
     border: none;
     background: transparent;
+    border-radius: 8px;
     cursor: pointer;
     padding: 0;
-    color: #737380;
+    position: relative;
+    transition: all 0.2s ease;
     flex-shrink: 0;
     
+    @media (min-width: $breakpoint-tablet) {
+      margin-left: 0.5rem;
+    }
+    
     &:hover {
-      color: #41414D;
+      background-color: #f0f0f0;
+    }
+    
+    &:active {
+      transform: scale(0.95);
+    }
+    
+    &:focus-visible {
+      outline: 2px solid #2563eb;
+      outline-offset: 2px;
     }
     
     svg {
@@ -133,20 +246,28 @@
       
       .cartBadge {
         position: absolute;
-        top: 10px;
-        right: -15px;
-        background: #DE3838;
-        color: #fff;
+        top: -4px;
+        right: -4px;
+        background-color: #DE3838;
+        color: white;
         border-radius: 50%;
-        min-width: 18px;
+        width: 18px;
         height: 18px;
-        display: inline-flex;
+        display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 10px;
-        font-weight: 500;
-        padding: 2px;
-        border: none;
+        font-size: 0.625rem;
+        font-weight: 600;
+        line-height: 1;
+        user-select: none;
+        pointer-events: none;
+        transition: transform 0.2s ease;
+        
+        @media (max-width: $breakpoint-mobile) {
+          width: 16px;
+          height: 16px;
+          font-size: 0.5rem;
+        }
       }
     }
   }

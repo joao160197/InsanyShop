@@ -229,19 +229,17 @@ export const fetchProductById = async (id: string | number): Promise<Product> =>
 
     const data = await response.json();
 
-    // Alguns endpoints podem devolver { product: {...} } ou o objeto já direto
+  
     const rawProduct = data?.product ?? data?.data ?? data;
     return normalizeProduct(rawProduct);
   } catch (error) {
     console.error(`Erro ao buscar produto com ID ${id}:`, error);
-    // Retorna um objeto normalizado básico para evitar quebra na UI
+   
     return normalizeProduct(null);
   }
 };
 
-/**
- * Busca todas as categorias
- */
+
 export const fetchCategories = async (): Promise<Category[]> => {
   const url = `${API_BASE_URL}/api/categories`;
   
@@ -262,29 +260,27 @@ export const fetchCategories = async (): Promise<Category[]> => {
     const data = await response.json();
     console.log('Dados recebidos da API de categorias:', data);
     
-    // Se a resposta for um objeto com uma propriedade 'categories', use-a
+   
     if (data && Array.isArray(data.categories)) {
       return data.categories;
     }
     
-    // Se for um array, retorna diretamente
+   
     if (Array.isArray(data)) {
       return data;
     }
     
-    // Se chegar aqui, a resposta não está no formato esperado
+   
     console.warn('Formato inesperado de resposta da API de categorias:', data);
     return [];
   } catch (error) {
     console.error('Erro ao buscar categorias:', error);
-    // Retorna um array vazio em caso de erro para evitar quebrar a UI
+   
     return [];
   }
 };
 
-/**
- * Busca sugestões de busca
- */
+
 export const searchProducts = async (query: string): Promise<Product[]> => {
   if (!query.trim()) return [];
   

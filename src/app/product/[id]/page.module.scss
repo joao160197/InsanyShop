@@ -1,15 +1,25 @@
 .container {
-  padding: 24px;
+  padding: 16px;
   display: flex;
   flex-direction: column;
   align-items: center;
   width: 100%;
+  box-sizing: border-box;
+  
+  @media (min-width: 768px) {
+    padding: 24px;
+  }
 }
 
 .backButtonContainer {
   width: 100%;
   max-width: 1200px;
   margin-bottom: 16px;
+  padding: 0 10px;
+  
+  @media (min-width: 768px) {
+    padding: 0;
+  }
 }
 
 .backButton {
@@ -47,25 +57,36 @@
 }
 
 .productContainer {
-  display: grid;
+  display: flex;
+  flex-direction: column;
   gap: 24px;
-  grid-template-columns: 1fr 1fr;
   max-width: 1200px;
   width: 100%;
+  
+  @media (min-width: 768px) {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
 }
 
 .imageContainer {
   display: flex;
-  justify-content: flex-start; 
+  justify-content: center;
   align-items: center;
   position: relative;
-  width: 640px;
-  height: 580px;
-  max-width: 640px; 
+  width: 100%;
+  height: 300px;
   aspect-ratio: 1/1;
   border-radius: 12px;
   overflow: hidden;
   background: #f2f2f2;
+  margin: 0 auto;
+  
+  @media (min-width: 768px) {
+    height: 480px;
+    max-width: 640px;
+    justify-content: flex-start;
+  }
 
   .productImage {
     object-fit: cover;
@@ -77,8 +98,14 @@
 
 
 .productInfo {
-
-  margin-left: 20px;
+  padding: 0 10px;
+  margin-top: 16px;
+  
+  @media (min-width: 768px) {
+    margin-left: 20px;
+    margin-top: 0;
+    padding: 0;
+  }
 
 
   .category {
@@ -97,13 +124,16 @@
     font-family: var(--font-inter), sans-serif;
     font-weight: 300;
     font-style: Light;
-    font-size: 32px;
+    font-size: 24px;
     line-height: 150%;
     letter-spacing: 0%;
     vertical-align: middle;
     color: #41414D;
-    margin-bottom: 6px;
-    margin-bottom: 5px;
+    margin-bottom: 12px;
+    
+    @media (min-width: 768px) {
+      font-size: 32px;
+    }
   }
 
   .price {
@@ -122,17 +152,22 @@
     font-family: var(--font-inter), sans-serif;
     font-weight: 500;
     font-style: normal;
-    font-size: 16px;
+    font-size: 14px;
     line-height: 150%;
     letter-spacing: 0%;
     vertical-align: middle;
     text-transform: uppercase;
     color: #737380;
-    margin-top: 100px;
+    margin-top: 24px;
+    
+    @media (min-width: 768px) {
+      font-size: 16px;
+      margin-top: 40px;
+    }
   }
 
   .description {
-    font-family: Inter;
+    font-family: Inter, sans-serif;
     font-weight: 400;
     font-style: Regular;
     font-size: 14px;
@@ -140,7 +175,11 @@
     letter-spacing: 0%;
     vertical-align: middle;
     color: #737380;
-    margin-bottom: 200px;
+    margin: 8px 0 32px;
+    
+    @media (min-width: 768px) {
+      margin-bottom: 200px;
+    }
   }
 
   .actions {
@@ -151,25 +190,28 @@
   }
 
   .addToCartButton {
-    width: 600px;
+    width: 100%;
+    max-width: 600px;
     height: 50px;
     border-radius: 4px;
     opacity: 1;
     gap: 16px;
-    padding-top: 8px;
-    padding-bottom: 8px;
-    color: #FFFFFF;
+    padding: 8px 16px;
     background-color: #000000;
     border: none;
     cursor: pointer;
     font-family: var(--font-inter), sans-serif;
-    font-size: larger;
-    font-weight: 300;
+    font-size: 16px;
+    font-weight: 500;
     font-style: normal;
     line-height: 150%;
-    letter-spacing: 0%;
-    vertical-align: middle;
+    letter-spacing: 0.5px;
     color: #FFFFFF;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto;
+    margin-top: -27px;
 
     &:hover {
       transform: scale(1.02);

@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from 'react';
 import styles from './FilterBar.module.scss';
-import { IoIosArrowDown } from "react-icons/io";
 import { fetchCategories } from '@/services/api';
 
 type OptionType = {
@@ -24,16 +23,19 @@ export function FilterBar({ onFilterChange, currentSort, currentCategory, classN
   const [isClient, setIsClient] = useState(false);
   const [categories, setCategories] = useState<OptionType[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<string>(currentCategory);
-  const [selectedSort, setSelectedSort] = useState<'newest' | 'price-asc' | 'price-desc' | 'best-sellers'>(currentSort);
+  const [selectedSort, setSelectedSort] = useState<string>('');
   const [isLoading, setIsLoading] = useState(true);
 
   const sortOptions: OptionType[] = priceOnly
     ? [
-        { value: 'price-desc', label: 'Organizar por' },
+        { value: '', label: 'Organizar por' },
+        { value: 'newest', label: 'Novidades' },
         { value: 'price-asc', label: 'Preço: Menor - maior' },
+        { value: 'price-desc', label: 'Preço: Maior - meno' },
       ]
     : [
-        { value: 'newest', label: 'Organizar por' },
+        { value: '', label: 'Organizar por' },
+        { value: 'newest', label: 'Novidades' },
         { value: 'price-desc', label: 'Preço: Maior - menor' },
         { value: 'price-asc', label: 'Preço: Menor - maior' },
         { value: 'best-sellers', label: 'Mais vendidos' },
@@ -42,13 +44,11 @@ export function FilterBar({ onFilterChange, currentSort, currentCategory, classN
   useEffect(() => {
     setIsClient(true);
     
-    // Fetch categories from API
     const loadCategories = async () => {
       try {
         const apiCategories = await fetchCategories();
-        // Add 'Todas as categorias' as the first option
         const formattedCategories = [
-          { value: 'all', label: 'Todas as categorias' },
+          { value: 'all', label: 'Selecione a categroria' },
           ...apiCategories.map(cat => ({
             value: cat.slug || String(cat.id),
             label: cat.name
@@ -57,7 +57,7 @@ export function FilterBar({ onFilterChange, currentSort, currentCategory, classN
         setCategories(formattedCategories);
       } catch (error) {
         console.error('Error loading categories:', error);
-        // Fallback to default categories if API fails
+       
         setCategories([
           { value: 'all', label: 'Todas as categorias' },
           { value: 'eletronicos', label: 'Eletrônicos' },
@@ -81,9 +81,12 @@ export function FilterBar({ onFilterChange, currentSort, currentCategory, classN
   };
 
   const handleSortChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const value = e.target.value as 'newest' | 'price-asc' | 'price-desc' | 'best-sellers';
+    const value = e.target.value;
     setSelectedSort(value);
-    onFilterChange('sort', value);
+    if (value) {
+      const sortValue = value as 'newest' | 'price-asc' | 'price-desc' | 'best-sellers';
+      onFilterChange('sort', sortValue);
+    }
   };
 
   if (!isClient || isLoading) {
@@ -91,15 +94,18 @@ export function FilterBar({ onFilterChange, currentSort, currentCategory, classN
   }
 
   return (
-    <div className={`${styles.filterBar} ${className}`.trim()}>
-      
+    <div 
+      className={`${styles.filterBar} ${className}`.trim()}
+    >
       <div className={styles.filterControls}>
         {!hideCategory && (
           <div className={styles.filterGroup}>
-            <select 
-              className={styles.select}
+            <select
+              id="category-filter"
               value={selectedCategory}
               onChange={handleCategoryChange}
+              className={styles.select}
+              disabled={isLoading}
             >
               {categories.map((option) => (
                 <option key={option.value} value={option.value}>
@@ -111,20 +117,21 @@ export function FilterBar({ onFilterChange, currentSort, currentCategory, classN
         )}
         
         <div className={styles.filterGroup}>
-          <select 
-            className={styles.select}
+          <select
+            id="sort-filter"
             value={selectedSort}
             onChange={handleSortChange}
+            className={styles.select}
+            disabled={isLoading}
           >
             {sortOptions.map((option) => (
-              <option key={option.value} value={option.value}>
+              <option key={option.value || 'default'} value={option.value}>
                 {option.label}
               </option>
             ))}
           </select>
         </div>
       </div>
-  
       {!hideTitle && <h1 className={styles.pageTitle}>Todos os produtos</h1>}
     </div>
   );

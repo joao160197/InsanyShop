@@ -20,12 +20,12 @@ type CartContextType = {
 const CartContext = createContext<CartContextType | undefined>(undefined);
 
 const STORAGE_KEY = "insanyshop_cart_v1";
-const SHIPPING_FLAT = 20; // R$ 20,00
+const SHIPPING_FLAT = 20; 
 
 export function CartProvider({ children }: { children: React.ReactNode }) {
   const [items, setItems] = useState<CartItem[]>([]);
 
-  // Carrega do localStorage ao montar
+
   useEffect(() => {
     try {
       const raw = localStorage.getItem(STORAGE_KEY);
@@ -38,7 +38,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     }
   }, []);
 
-  // Persiste no localStorage a cada alteração
+  
   useEffect(() => {
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(items));

@@ -19,7 +19,7 @@ export default function Header() {
   const [categories, setCategories] = useState<Category[]>([]);
 
   useEffect(() => {
-    // Carrega categorias para permitir redirecionar buscas por nome de categoria
+   
     const load = async () => {
       const cats = await fetchCategories();
       setCategories(cats || []);
@@ -31,11 +31,11 @@ export default function Header() {
     s
       .toLowerCase()
       .normalize('NFD')
-      // remove diacríticos (acentos)
+  
       .replace(/[\u0300-\u036f]/g, '')
-      // trocar espaços e não-alfanuméricos por '-'
+    
       .replace(/[^a-z0-9]+/g, '-')
-      // remover '-' no início/fim
+ 
       .replace(/^-+|-+$/g, '')
   );
 
@@ -53,7 +53,7 @@ export default function Header() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const term = search.trim();
-    // Se estiver em uma página de categoria, mantém na categoria com ?search=
+    
     const path = pathname || "/";
     if (path.startsWith("/categoria/")) {
       const slug = path.split("/")[2] || "";
@@ -61,8 +61,7 @@ export default function Header() {
       router.push(url);
       return;
     }
-    // Caso contrário, tenta identificar categoria pelo termo
-    // Garante que as categorias foram carregadas
+   
     if (!categories || categories.length === 0) {
       try {
         const cats = await fetchCategories();
@@ -71,18 +70,18 @@ export default function Header() {
     }
     if (term) {
       const norm = normalize(term);
-      // Match exato por slug ou nome normalizado
+     
       if (categoryIndex.has(norm)) {
         router.push(`/categoria/${categoryIndex.get(norm)}`);
         return;
       }
-      // Match por prefixo de slug
+      
       const match = [...categoryIndex.keys()].find(k => k.startsWith(norm));
       if (match) {
         router.push(`/categoria/${categoryIndex.get(match)}`);
         return;
       }
-      // Fallback simples para termos comuns, caso a API de categorias esteja indisponível
+    
       const fallbackMap: Record<string, string> = {
         'eletronicos': 'eletronicos',
         'eletronicos-e-informatica': 'eletronicos-e-informatica',
@@ -99,7 +98,6 @@ export default function Header() {
         return;
       }
     }
-    // Sem match de categoria: busca na Home
     router.push(term ? `/?search=${encodeURIComponent(term)}` : "/");
   };
 

@@ -15,14 +15,14 @@ export function FeaturedCategories({ onCategorySelect }: FeaturedCategoriesProps
   const [error, setError] = useState<string | null>(null);
   const [hoveredCard, setHoveredCard] = useState<number | null>(null);
 
-  // Buscar categorias da API
+
   useEffect(() => {
     const loadCategories = async () => {
       try {
         setIsLoading(true);
         const data = await fetchCategories();
         
-        // Pegar apenas as primeiras 5 categorias para exibição
+        
         const topCategories = data.slice(0, 5);
         setCategories(topCategories);
       } catch (err) {
@@ -55,7 +55,7 @@ export function FeaturedCategories({ onCategorySelect }: FeaturedCategoriesProps
   }
 
   if (categories.length === 0) {
-    return null; // Não renderiza nada se não houver categorias
+    return null; 
   }
 
   return (

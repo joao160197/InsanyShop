@@ -20,13 +20,13 @@ export function Pagination({
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  // Se não houver páginas suficientes, não exibe a paginação
+  
   if (totalPages <= 1) return null;
 
-  // Cria um array de números de página para exibir
+ 
   const getPageNumbers = () => {
     const pages = [];
-    const maxVisiblePages = 5; // Número máximo de botões de página visíveis
+    const maxVisiblePages = 5;
     
     let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
     let endPage = startPage + maxVisiblePages - 1;

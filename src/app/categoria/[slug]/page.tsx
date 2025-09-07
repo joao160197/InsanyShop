@@ -229,27 +229,23 @@ export default function CategoryPage() {
   return (
     <main className={styles.container}>
       <div className={styles.contentWrapper}>
-
-        {/* Breadcrumb e FilterBar lado a lado */}
         <div className={styles.headerTop}>
           <div className={styles.breadcrumb}>
             Produtos / <span className={styles.categoryName}>{categoryName || 'Categoria'}</span>
           </div>
-
-        <div className={styles.filterBarContainer}>
-        <FilterBar 
-           className={styles.filterBar}
-            currentSort={filters.sort}
-            currentCategory={slug || 'all'}
-            onFilterChange={handleFilterChange}
-            hideCategory
-            priceOnly
-            hideTitle
-          />
+          <div className={styles.filterBarContainer}>
+            <FilterBar 
+              className={styles.filterBar}
+              currentSort={filters.sort}
+              currentCategory={slug || 'all'}
+              onFilterChange={handleFilterChange}
+              hideCategory
+              priceOnly
+              hideTitle
+            />
+          </div>
         </div>
-        </div>
 
-        {/* Título e tagline */}
         <div className={styles.headerSection}>
           <h1 className={styles.pageTitle}>{categoryName || 'Categoria'}</h1>
           {categoryTagline && (

@@ -1,10 +1,10 @@
-// Extend the Window interface to include our test API function
+
 declare global {
   interface Window {
     testApi: () => Promise<any>;
   }
 
-  // Allow CSS module imports
+  
   declare module '*.module.css' {
     const classes: { [key: string]: string };
     export default classes;
