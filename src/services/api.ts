@@ -2,9 +2,7 @@ import { Product, ProductsResponse, Category, SearchParams, SearchProductRespons
 
 const API_BASE_URL = 'https://api.insany.co';
 
-/**
- * Constrói uma URL de consulta com parâmetros
- */
+
 const buildQueryString = (params: SearchParams): string => {
   const query = new URLSearchParams();
   
@@ -17,21 +15,21 @@ const buildQueryString = (params: SearchParams): string => {
   return query.toString();
 };
 
-// Type guard para verificar se um objeto é um SearchProductResponse válido
+
 const isValidProduct = (item: unknown): item is SearchProductResponse => {
   if (!item || typeof item !== 'object') return false;
   const obj = item as Record<string, unknown>;
   return 'id' in obj || 'name' in obj || 'title' in obj;
 };
 
-// Função para normalizar um produto da API para o formato esperado pela UI
+
 const normalizeProduct = (raw: unknown, idx: number): Product | null => {
   try {
     if (!raw || typeof raw !== 'object') return null;
     
     const obj = raw as Record<string, unknown>;
     
-    // Extrair valores com fallbacks seguros
+    
     const id = Number(obj.id ?? idx + 1);
     const name = String(obj.name ?? obj.title ?? '');
     const description = String(obj.description ?? obj.details ?? obj.desc ?? '');
@@ -40,7 +38,7 @@ const normalizeProduct = (raw: unknown, idx: number): Product | null => {
     const rating = Number(obj.rating ?? obj.rate ?? 0) || 0;
     const brand = String(obj.brand ?? obj.maker ?? obj.manufacturer ?? '');
     
-    // Extrair URL da imagem
+    
     let image = '/image/image.png';
     const rawImage = obj.image ?? obj.thumbnail ?? 
       (Array.isArray(obj.images) ? obj.images[0] : undefined);
@@ -52,7 +50,7 @@ const normalizeProduct = (raw: unknown, idx: number): Product | null => {
       image = rawImage.url.trim();
     }
     
-    // Extrair categoria
+
     let category = 'Categoria';
     const extractCategory = (value: unknown): string => {
       if (typeof value === 'string') return value;
@@ -86,17 +84,15 @@ const normalizeProduct = (raw: unknown, idx: number): Product | null => {
   }
 };
 
-/**
- * Busca produtos com base nos parâmetros fornecidos
- */
+
 export const fetchProducts = async (params: SearchParams = {}): Promise<ProductsResponse> => {
-  // Se houver termo de busca, usar o endpoint dedicado de busca e paginar no cliente
+ 
   if (params.search && params.search.trim()) {
     const q = params.search.trim();
     const page = Math.max(1, Number(params.page) || 1);
     const limit = Math.max(1, Number(params.limit) || 6);
     
-    // Validar parâmetro de ordenação
+
     const validSortValues = ['newest', 'price-asc', 'price-desc', 'best-sellers'] as const;
     type SortValue = typeof validSortValues[number];
     const sort = validSortValues.includes(params.sort as SortValue) ? params.sort as SortValue : undefined;
@@ -112,18 +108,18 @@ export const fetchProducts = async (params: SearchParams = {}): Promise<Products
       
       const rawResults = await res.json();
       
-      // Processar resultados da busca
+      
       const processSearchResults = (results: unknown): Product[] => {
         if (!results) return [];
         
-        // Se for um array, processar cada item
+      
         if (Array.isArray(results)) {
           return results
             .map((item, idx) => normalizeProduct(item, idx))
             .filter((p): p is Product => p !== null);
         }
         
-        // Se for um objeto com propriedade 'results', processar os resultados
+        
         if (typeof results === 'object' && results !== null && 'results' in results) {
           const resultsArray = (results as { results: unknown }).results;
           if (Array.isArray(resultsArray)) {
@@ -136,10 +132,10 @@ export const fetchProducts = async (params: SearchParams = {}): Promise<Products
         return [];
       };
       
-      // Obter produtos processados
+ 
       const allProducts = processSearchResults(rawResults);
       
-      // Aplicar filtro de categoria se especificado
+
       let filtered = [...allProducts];
       if (params.category && params.category !== 'all') {
         const categoryFilter = params.category.toLowerCase();
@@ -148,7 +144,7 @@ export const fetchProducts = async (params: SearchParams = {}): Promise<Products
         );
       }
       
-      // Aplicar ordenação se especificada
+   
       if (sort) {
         switch (sort) {
           case 'price-asc':
@@ -160,11 +156,11 @@ export const fetchProducts = async (params: SearchParams = {}): Promise<Products
           case 'best-sellers':
             filtered.sort((a, b) => b.rating - a.rating);
             break;
-          // 'newest' é o padrão e já está ordenado por data de criação
+        
         }
       }
       
-      // Aplicar paginação
+   
       const totalPages = Math.ceil(filtered.length / limit);
       const startIndex = (page - 1) * limit;
       const paginated = filtered.slice(startIndex, startIndex + limit);
@@ -183,7 +179,7 @@ export const fetchProducts = async (params: SearchParams = {}): Promise<Products
     } catch (error) {
       console.error('Erro ao buscar produtos:', error);
       console.error('Erro ao buscar produtos:', error);
-      // Retorna uma resposta vazia em caso de erro, já que ProductsResponse não suporta propriedade de erro
+ 
       return {
         products: [],
         pagination: {
@@ -197,7 +193,7 @@ export const fetchProducts = async (params: SearchParams = {}): Promise<Products
     }
   }
 
-  // Fluxo padrão: /api/products com query string
+
   const cleanParams: Record<string, string | number> = {};
   if (params.category && params.category !== 'all') cleanParams.category = params.category;
   if (params.search) cleanParams.search = params.search;
@@ -254,13 +250,10 @@ export const fetchProducts = async (params: SearchParams = {}): Promise<Products
   }
 };
 
-/**
- * Busca um produto pelo ID
- */
 export const fetchProductById = async (id: string | number): Promise<Product> => {
   const url = `${API_BASE_URL}/api/products/${id}`;
 
-  // Helper para normalizar diferentes formatos de produto vindos da API
+
   const normalizeProduct = (raw: any): Product => {
     if (!raw) {
       return {
@@ -276,12 +269,9 @@ export const fetchProductById = async (id: string | number): Promise<Product> =>
       };
     }
 
-    // Possíveis alternativas de campos
     const name = raw.name ?? raw.title ?? '';
     const description = raw.description ?? raw.details ?? raw.desc ?? '';
     const priceNum = Number(raw.price ?? raw.value ?? raw.amount ?? 0) || 0;
-
-    // Resolver imagem: string direta, objeto com url, array de imagens, thumbnail, etc
     let image: string | undefined;
     const rawImage = raw.image ?? raw.thumbnail ?? raw.thumb ?? (Array.isArray(raw.images) ? raw.images[0] : undefined);
     if (typeof rawImage === 'string' && rawImage.trim()) {
@@ -291,7 +281,6 @@ export const fetchProductById = async (id: string | number): Promise<Product> =>
     }
     if (!image) image = '/image/image.png';
 
-    // Categoria pode ser string, objeto ou array
     let category: string = 'Categoria';
     if (typeof raw.category === 'string') category = raw.category;
     else if (raw.category && typeof raw.category.name === 'string') category = raw.category.name;
