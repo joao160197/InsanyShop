@@ -17,7 +17,6 @@ export default function Home() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [totalPages, setTotalPages] = useState(1);
-  const [totalProducts, setTotalProducts] = useState(0);
   const searchParams = useSearchParams();
   const { addItem } = useCart();
   
@@ -58,13 +57,11 @@ export default function Home() {
       
       setProducts(response.products || []);
       setTotalPages(response.pagination?.totalPages || 1);
-      setTotalProducts(response.pagination?.totalProducts || 0);
     } catch (err) {
       console.error('Erro ao carregar produtos:', err);
       setError('Não foi possível carregar os produtos. Tente novamente mais tarde.');
       setProducts([]);
       setTotalPages(1);
-      setTotalProducts(0);
     } finally {
       setIsLoading(false);
     }
@@ -148,8 +145,7 @@ export default function Home() {
   return (
     <main className={styles.container}>
       <FilterBar 
-        onFilterChange={handleFilterChange} 
-        currentSort={filters.sort}
+        onFilterChange={handleFilterChange}
         currentCategory={filters.category}
       />
       
@@ -161,8 +157,7 @@ export default function Home() {
           <div style={{ display: isLoading ? 'none' : 'block' }}>
             <Cards 
               products={filteredProducts} 
-              onAddToCart={handleAddToCart} 
-              categoryName={filters.category !== 'all' ? filters.category : undefined}
+              onAddToCart={handleAddToCart}
             />
           </div>
           

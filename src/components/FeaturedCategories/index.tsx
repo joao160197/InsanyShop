@@ -13,7 +13,6 @@ export function FeaturedCategories({ onCategorySelect }: FeaturedCategoriesProps
   const [categories, setCategories] = useState<Category[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [hoveredCard, setHoveredCard] = useState<number | null>(null);
 
 
   useEffect(() => {
@@ -66,8 +65,6 @@ export function FeaturedCategories({ onCategorySelect }: FeaturedCategoriesProps
           <div 
             key={category.id} 
             className={styles.categoryCard}
-            onMouseEnter={() => setHoveredCard(category.id)}
-            onMouseLeave={() => setHoveredCard(null)}
             onClick={() => onCategorySelect?.(category.slug || String(category.id))}
           >
             <h3 className={styles.categoryName}>{category.name}</h3>

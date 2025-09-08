@@ -1,7 +1,14 @@
 
+// Define a response type for the test API
+interface TestApiResponse {
+  success: boolean;
+  message?: string;
+  data?: unknown;
+}
+
 declare global {
   interface Window {
-    testApi: () => Promise<any>;
+    testApi: () => Promise<TestApiResponse>;
   }
 
   

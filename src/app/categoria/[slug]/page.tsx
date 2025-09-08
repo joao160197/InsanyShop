@@ -70,18 +70,47 @@ export default function CategoryPage() {
 
   const categoryTagline = useMemo(() => {
     const key = (slug || '').toString().toLowerCase();
+    
     const map: Record<string, string> = {
-      eletronicos: 'Smartphones, laptops, consoles e mais',
+      
+      'eletronicos': 'Smartphones, laptops, consoles e mais',
       'eletronicos-e-informatica': 'Smartphones, laptops, consoles e mais',
-      tecnologia: 'Smartphones, laptops, consoles e mais',
-      roupas: 'Moda masculina, feminina e infantil',
+      'tecnologia': 'Smartphones, laptops, consoles e mais',
+      'eletronico': 'Smartphones, laptops, consoles e mais',
+      
+     
+      'roupas': 'Moda masculina, feminina e infantil',
+      'roupa': 'Moda masculina, feminina e infantil',
       'roupas-e-calcados': 'Moda masculina, feminina e infantil',
-      calcados: 'Tênis, botas, sandálias e mais',
-      esporte: 'Acessórios, vestuário e mais para o seu treino',
-      casa: 'Decoração, utilidades e móveis',
-      livros: 'Ficção, não-ficção, didáticos e mais',
+      
+    
+      'calcados': 'Tênis, botas, sandálias e mais',
+      'calçados': 'Tênis, botas, sandálias e mais',
+      'sapatos': 'Tênis, botas, sandálias e mais',
+      
+  
+      'esporte': 'Acessórios, vestuário e mais para o seu treino',
+      'esportes': 'Acessórios, vestuário e mais para o seu treino',
+      'esportivo': 'Acessórios, vestuário e mais para o seu treino',
+      'esportiva': 'Acessórios, vestuário e mais para o seu treino',
+      
+      
+      'casa': 'Decoração, utilidades e móveis',
+      'lar': 'Decoração, utilidades e móveis',
+      'casa-e-decoracao': 'Decoração, utilidades e móveis',
+      
+  
+      'livros': 'Ficção, não-ficção, didáticos e mais',
+      'livro': 'Ficção, não-ficção, didáticos e mais',
+      'leitura': 'Ficção, não-ficção, didáticos e mais',
     };
-    return map[key] || '';
+    
+
+    if (map[key]) return map[key];
+    
+   
+    const matchedKey = Object.keys(map).find(k => key.includes(k));
+    return matchedKey ? map[matchedKey] : '';
   }, [slug]);
 
   const loadProducts = useCallback(async () => {
@@ -146,7 +175,6 @@ export default function CategoryPage() {
     }
   }, [filters.sort]);
 
-  // Sort and pagination handlers are now handled by handleFilterChange
 
   const handleFilterChange = (filterType: string, value: string) => {
     setFilters(prev => ({
@@ -233,7 +261,6 @@ export default function CategoryPage() {
           <div className={styles.filterBarContainer}>
             <FilterBar 
               className={styles.filterBar}
-              currentSort={filters.sort}
               currentCategory={slug || 'all'}
               onFilterChange={handleFilterChange}
               hideCategory
@@ -252,7 +279,6 @@ export default function CategoryPage() {
 
         <Cards 
           products={sortedProducts} 
-          categoryName={categoryName}
           onAddToCart={handleAddToCart}
         />
         

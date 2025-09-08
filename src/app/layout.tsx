@@ -1,20 +1,22 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import { Inter } from 'next/font/google';
 import "./globals.css";
 import ClientLayout from "./ClientLayout";
 
-// Load fonts
+// Load Geist Sans font
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
 });
 
-import { Inter } from 'next/font/google';
+// Load Inter font
 const inter = Inter({ 
   subsets: ['latin'],
   variable: '--font-inter',
 });
 
+// Load Geist Mono font
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
@@ -31,7 +33,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="pt-BR" suppressHydrationWarning>
+    <html 
+      lang="pt-BR" 
+      suppressHydrationWarning
+      className={`${geistSans.variable} ${geistMono.variable} ${inter.variable}`}
+    >
       <head>
         <script
           dangerouslySetInnerHTML={{
@@ -53,7 +59,7 @@ export default function RootLayout({
           }}
         />
       </head>
-      <body className={`${inter.variable} font-sans`} suppressHydrationWarning>
+      <body className="min-h-screen bg-background font-sans antialiased">
         <ClientLayout>
           {children}
         </ClientLayout>

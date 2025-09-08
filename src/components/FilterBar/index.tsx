@@ -11,7 +11,6 @@ type OptionType = {
 
 type FilterBarProps = {
   onFilterChange: (filterType: string, value: string) => void;
-  currentSort: 'newest' | 'price-asc' | 'price-desc' | 'best-sellers';
   currentCategory: string;
   className?: string;
   hideCategory?: boolean;
@@ -19,7 +18,7 @@ type FilterBarProps = {
   hideTitle?: boolean;
 };
 
-export function FilterBar({ onFilterChange, currentSort, currentCategory, className = '', hideCategory = false, priceOnly = false, hideTitle = false }: FilterBarProps) {
+export function FilterBar({ onFilterChange, currentCategory, className = '', hideCategory = false, priceOnly = false, hideTitle = false }: FilterBarProps) {
   const [isClient, setIsClient] = useState(false);
   const [categories, setCategories] = useState<OptionType[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<string>(currentCategory);

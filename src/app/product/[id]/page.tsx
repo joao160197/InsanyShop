@@ -27,8 +27,9 @@ export default function ProductPage() {
         setLoading(true);
         const data = await fetchProductById(id);
         setProduct(data);
-      } catch (e: any) {
-        setError(e?.message || 'Falha ao carregar produto');
+      } catch (error: unknown) {
+        const errorMessage = error instanceof Error ? error.message : 'Falha ao carregar produto';
+        setError(errorMessage);
       } finally {
         setLoading(false);
       }

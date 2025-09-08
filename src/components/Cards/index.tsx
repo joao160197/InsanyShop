@@ -10,10 +10,9 @@ import type { Product } from "@/types/api";
 type CardsProps = {
   products: Product[];
   onAddToCart: (product: Product) => void;
-  categoryName?: string;
 };
 
-export function Cards({ products, onAddToCart, categoryName }: CardsProps) {
+export function Cards({ products, onAddToCart }: CardsProps) {
   const getProductImage = (product: Product) => {
     const raw = product.image;
     if (typeof raw === 'string' && raw.trim()) return raw;

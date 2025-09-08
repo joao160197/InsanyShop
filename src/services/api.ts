@@ -1,4 +1,14 @@
-import { Product, ProductsResponse, Category, SearchParams, SearchProductResponse, CategoryObject } from '@/types/api';
+import { Product, ProductsResponse, Category, SearchParams } from '@/types/api';
+
+// Local interface for ImageObject since it's not exported from api.ts
+interface ImageObject {
+  url: string;
+  name?: string;
+  alt?: string;
+  width?: number;
+  height?: number;
+  [key: string]: unknown;
+}
 
 const API_BASE_URL = 'https://api.insany.co';
 
@@ -15,12 +25,6 @@ const buildQueryString = (params: SearchParams): string => {
   return query.toString();
 };
 
-
-const isValidProduct = (item: unknown): item is SearchProductResponse => {
-  if (!item || typeof item !== 'object') return false;
-  const obj = item as Record<string, unknown>;
-  return 'id' in obj || 'name' in obj || 'title' in obj;
-};
 
 
 const normalizeProduct = (raw: unknown, idx: number): Product | null => {
@@ -250,51 +254,168 @@ export const fetchProducts = async (params: SearchParams = {}): Promise<Products
   }
 };
 
+// Define a type for the raw product data from the API
+interface RawProduct {
+  id?: number | string;
+  name?: string;
+  title?: string;
+  description?: string;
+  details?: string;
+  desc?: string;
+  price?: number | string;
+  value?: number | string;
+  amount?: number | string;
+  image?: string | ImageObject;
+  thumbnail?: string | ImageObject;
+  thumb?: string | ImageObject;
+  images?: Array<string | ImageObject>;
+  category?: string | { name?: string } | { category?: string } | { categories?: Array<{ name?: string }> };
+  stock?: number;
+  quantity?: number;
+  qtd?: number;
+  rating?: number;
+  rate?: number;
+  brand?: string;
+  maker?: string;
+  manufacturer?: string;
+  [key: string]: unknown;
+}
+
 export const fetchProductById = async (id: string | number): Promise<Product> => {
   const url = `${API_BASE_URL}/api/products/${id}`;
 
+  const getDefaultProduct = (productId: string | number): Product => ({
+    id: Number(productId),
+    name: 'Produto',
+    description: '',
+    price: 0,
+    image: '/image/image.png',
+    category: 'Categoria',
+    stock: 0,
+    rating: 0,
+    brand: ''
+  });
 
-  const normalizeProduct = (raw: any): Product => {
-    if (!raw) {
-      return {
-        id: Number(id),
-        name: 'Produto',
-        description: '',
-        price: 0,
-        image: '/image/image.png',
-        category: 'Categoria',
-        stock: 0,
-        rating: 0,
-        brand: ''
-      };
+  const normalizeProduct = (raw: unknown): Product => {
+    if (!raw || typeof raw !== 'object' || raw === null) {
+      return getDefaultProduct(id);
+    }
+    
+    // Type guard to check if the object has the expected properties
+    const isRawProduct = (obj: unknown): obj is RawProduct => {
+      return obj !== null && typeof obj === 'object' && 
+        ('id' in obj || 'name' in obj || 'title' in obj);
+    };
+    
+    if (!isRawProduct(raw)) {
+      return getDefaultProduct(id);
     }
 
-    const name = raw.name ?? raw.title ?? '';
-    const description = raw.description ?? raw.details ?? raw.desc ?? '';
-    const priceNum = Number(raw.price ?? raw.value ?? raw.amount ?? 0) || 0;
-    let image: string | undefined;
-    const rawImage = raw.image ?? raw.thumbnail ?? raw.thumb ?? (Array.isArray(raw.images) ? raw.images[0] : undefined);
+    // Type assertion for the raw product data
+    const product = raw as Record<string, unknown>;
+    
+    // Helper function to safely get a string value
+    const getString = (value: unknown, defaultValue = ''): string => 
+      value !== undefined && value !== null ? String(value) : defaultValue;
+    
+    // Helper function to safely get a number value
+    const getNumber = (value: unknown, defaultValue = 0): number => {
+      const num = Number(value);
+      return Number.isFinite(num) ? num : defaultValue;
+    };
+
+    // Extract name
+    const name = getString(
+      (product as { name?: unknown }).name || 
+      (product as { title?: unknown }).title, 
+      'Produto sem nome'
+    );
+    
+    // Extract description
+    const description = getString(
+      (product as { description?: unknown }).description || 
+      (product as { details?: unknown }).details || 
+      (product as { desc?: unknown }).desc,
+      'Sem descrição disponível'
+    );
+    
+    // Extract price
+    const priceNum = getNumber(
+      (product as { price?: unknown }).price || 
+      (product as { value?: unknown }).value || 
+      (product as { amount?: unknown }).amount
+    );
+    
+    // Extract image
+    let image = '/image/image.png';
+    const rawImage = (product as { image?: unknown }).image || 
+                    (product as { thumbnail?: unknown }).thumbnail || 
+                    (product as { thumb?: unknown }).thumb;
+    
     if (typeof rawImage === 'string' && rawImage.trim()) {
-      image = rawImage;
-    } else if (rawImage && typeof rawImage === 'object' && typeof rawImage.url === 'string' && rawImage.url.trim()) {
-      image = rawImage.url;
+      image = rawImage.trim();
+    } else if (rawImage && typeof rawImage === 'object' && rawImage !== null && 'url' in rawImage) {
+      const url = (rawImage as { url: unknown }).url;
+      if (typeof url === 'string' && url.trim()) {
+        image = url.trim();
+      }
     }
-    if (!image) image = '/image/image.png';
-
-    let category: string = 'Categoria';
-    if (typeof raw.category === 'string') category = raw.category;
-    else if (raw.category && typeof raw.category.name === 'string') category = raw.category.name;
-    else if (Array.isArray(raw.categories) && raw.categories.length) {
-      const c = raw.categories[0];
-      category = typeof c === 'string' ? c : (c?.name ?? category);
+    
+    // Handle images array
+    const productImages = (product as { images?: unknown }).images;
+    if (Array.isArray(productImages) && productImages.length > 0) {
+      const firstImage = productImages[0];
+      if (typeof firstImage === 'string' && firstImage.trim()) {
+        image = firstImage.trim();
+      } else if (firstImage && typeof firstImage === 'object' && firstImage !== null && 'url' in firstImage) {
+        const url = (firstImage as { url: unknown }).url;
+        if (typeof url === 'string' && url.trim()) {
+          image = url.trim();
+        }
+      }
     }
 
-    const stockNum = Number(raw.stock ?? raw.quantity ?? raw.qtd ?? 0) || 0;
-    const ratingNum = Number(raw.rating ?? raw.rate ?? 0) || 0;
-    const brand = raw.brand ?? raw.maker ?? raw.manufacturer ?? '';
+    // Extract category
+    let category = 'Categoria';
+    const categoryValue = (product as { category?: unknown }).category;
+    if (typeof categoryValue === 'string') {
+      category = categoryValue;
+    } else if (categoryValue && typeof categoryValue === 'object' && categoryValue !== null && 'name' in categoryValue) {
+      const name = (categoryValue as { name: unknown }).name;
+      if (typeof name === 'string') {
+        category = name;
+      }
+    }
+    
+    // Extract stock
+    const stockNum = getNumber(
+      (product as { stock?: unknown }).stock || 
+      (product as { quantity?: unknown }).quantity || 
+      (product as { qtd?: unknown }).qtd
+    );
+    
+    // Extract rating
+    const ratingNum = getNumber(
+      (product as { rating?: unknown }).rating || 
+      (product as { rate?: unknown }).rate
+    );
+    
+    // Extract brand
+    const brand = getString(
+      (product as { brand?: unknown }).brand || 
+      (product as { maker?: unknown }).maker || 
+      (product as { manufacturer?: unknown }).manufacturer,
+      'Marca desconhecida'
+    );
+    
+    // Extract ID
+    const productId = getNumber(
+      (product as { id?: unknown }).id || id,
+      typeof id === 'number' ? id : 0
+    );
 
     return {
-      id: Number(raw.id ?? id),
+      id: productId,
       name,
       description,
       price: priceNum,

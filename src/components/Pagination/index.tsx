@@ -1,6 +1,5 @@
 'use client';
 
-import { useRouter, useSearchParams } from 'next/navigation';
 import styles from './Pagination.module.scss';
 import { FiChevronLeft, FiChevronRight } from 'react-icons/fi';
 
@@ -17,9 +16,6 @@ export function Pagination({
   onPageChange,
   className = '' 
 }: PaginationProps) {
-  const router = useRouter();
-  const searchParams = useSearchParams();
-
   
   if (totalPages <= 1) return null;
 

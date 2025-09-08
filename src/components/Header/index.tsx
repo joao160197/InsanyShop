@@ -12,7 +12,6 @@ import type { Category } from "@/types/api";
 
 export default function Header() {
   const [search, setSearch] = useState("");
-  const [cart, setCart] = useState([]);
   const router = useRouter();
   const pathname = usePathname();
   const { count } = useCart();
