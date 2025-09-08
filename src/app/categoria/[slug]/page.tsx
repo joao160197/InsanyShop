@@ -1,7 +1,7 @@
 'use client';
 
-import { useState, useEffect, useCallback, useMemo } from 'react';
-import { useSearchParams, useParams } from 'next/navigation';
+import { useState, useEffect, useCallback, useMemo, Suspense } from 'react';
+import { useParams } from 'next/navigation';
 import Link from 'next/link';
 import { Cards } from '@/components/Cards';
 import { FilterBar } from '@/components/FilterBar';
@@ -10,9 +10,9 @@ import { fetchProducts } from '@/services/api';
 import type { Product } from '@/types/api';
 import styles from './page.module.scss';
 import { useCart } from '@/context/CartContext';
+import SearchParamsWrapper from '@/components/SearchParamsWrapper';
 
-export default function CategoryPage() {
-  const searchParams = useSearchParams();
+function CategoryPageContent() {
   const params = useParams();
   const { addItem } = useCart();
   
@@ -33,10 +33,10 @@ export default function CategoryPage() {
     limit: number;
     search: string;
   }>({
-    sort: (searchParams?.get('sort') as SortOption) || 'price-desc',
-    page: parseInt(searchParams?.get('page') || '1'),
+    sort: 'price-desc',
+    page: 1,
     limit: 6,
-    search: (searchParams?.get('search') || '').trim(),
+    search: '',
   });
 
   useEffect(() => {
@@ -58,15 +58,14 @@ export default function CategoryPage() {
     }
   }, [slug]);
 
-  useEffect(() => {
-    const term = (searchParams.get('search') || '').trim();
+  const handleSearchParamsChange = useCallback((searchTerm: string) => {
     setFilters(prev => {
-      if ((prev.search || '') !== term) {
-        return { ...prev, search: term, page: 1 };
+      if ((prev.search || '') !== searchTerm) {
+        return { ...prev, search: searchTerm, page: 1 };
       }
       return prev;
     });
-  }, [searchParams]);
+  }, []);
 
   const categoryTagline = useMemo(() => {
     const key = (slug || '').toString().toLowerCase();
@@ -253,6 +252,7 @@ export default function CategoryPage() {
 
   return (
     <main className={styles.container}>
+      <SearchParamsWrapper onSearchParamsChange={handleSearchParamsChange} />
       <div className={styles.contentWrapper}>
         <div className={styles.headerTop}>
           <div className={styles.breadcrumb}>
@@ -296,5 +296,13 @@ export default function CategoryPage() {
         )}
       </div>
     </main>
+  );
+}
+
+export default function CategoryPage() {
+  return (
+    <Suspense fallback={<div>Carregando...</div>}>
+      <CategoryPageContent />
+    </Suspense>
   );
 }

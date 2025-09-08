@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useMemo, useCallback } from "react";
+import { useState, useEffect, useMemo, useCallback, Suspense } from "react";
 import { Cards } from "@/components/Cards/index";
 import { FilterBar } from "@/components/FilterBar";
 import { Pagination } from "@/components/Pagination";
@@ -8,16 +8,16 @@ import { FeaturedCategories } from "@/components/FeaturedCategories";
 import { fetchProducts } from "@/services/api";
 import type { Product } from "@/types/api";
 import styles from "./page.module.css";
-import { useSearchParams, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { useCart } from "@/context/CartContext";
+import SearchParamsWrapper from "@/components/SearchParamsWrapper";
 
-export default function Home() {
+function HomeContent() {
   const router = useRouter();
   const [products, setProducts] = useState<Product[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [totalPages, setTotalPages] = useState(1);
-  const searchParams = useSearchParams();
   const { addItem } = useCart();
   
   const [filters, setFilters] = useState({
@@ -72,17 +72,14 @@ export default function Home() {
     loadProducts();
   }, [loadProducts]);
 
-  
-  useEffect(() => {
-    const term = (searchParams.get('search') || '').trim();
+  const handleSearchParamsChange = useCallback((searchTerm: string) => {
     setFilters(prev => {
-      
-      if ((prev.search || '') !== term) {
-        return { ...prev, search: term, page: 1 };
+      if ((prev.search || '') !== searchTerm) {
+        return { ...prev, search: searchTerm, page: 1 };
       }
       return prev;
     });
-  }, [searchParams]);
+  }, []);
 
   const handleFilterChange = (filterType: string, value: string) => {
     console.log('Filter changed:', { filterType, value });
@@ -144,6 +141,7 @@ export default function Home() {
 
   return (
     <main className={styles.container}>
+      <SearchParamsWrapper onSearchParamsChange={handleSearchParamsChange} />
       <FilterBar 
         onFilterChange={handleFilterChange}
         currentCategory={filters.category}
@@ -169,9 +167,18 @@ export default function Home() {
             />
           )}
           
+          
           <FeaturedCategories onCategorySelect={handleCategorySelect} />
         </>
       )}
     </main>
+  );
+}
+
+export default function Home() {
+  return (
+    <Suspense fallback={<div>Carregando...</div>}>
+      <HomeContent />
+    </Suspense>
   );
 }
