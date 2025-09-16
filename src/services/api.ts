@@ -1,6 +1,6 @@
 import { Product, ProductsResponse, Category, SearchParams } from '@/types/api';
 
-// Local interface for ImageObject since it's not exported from api.ts
+
 interface ImageObject {
   url: string;
   name?: string;
@@ -254,7 +254,6 @@ export const fetchProducts = async (params: SearchParams = {}): Promise<Products
   }
 };
 
-// Define a type for the raw product data from the API
 interface RawProduct {
   id?: number | string;
   name?: string;
@@ -301,7 +300,7 @@ export const fetchProductById = async (id: string | number): Promise<Product> =>
       return getDefaultProduct(id);
     }
     
-    // Type guard to check if the object has the expected properties
+  
     const isRawProduct = (obj: unknown): obj is RawProduct => {
       return obj !== null && typeof obj === 'object' && 
         ('id' in obj || 'name' in obj || 'title' in obj);
@@ -311,27 +310,27 @@ export const fetchProductById = async (id: string | number): Promise<Product> =>
       return getDefaultProduct(id);
     }
 
-    // Type assertion for the raw product data
+    
     const product = raw as Record<string, unknown>;
     
-    // Helper function to safely get a string value
+   
     const getString = (value: unknown, defaultValue = ''): string => 
       value !== undefined && value !== null ? String(value) : defaultValue;
     
-    // Helper function to safely get a number value
+
     const getNumber = (value: unknown, defaultValue = 0): number => {
       const num = Number(value);
       return Number.isFinite(num) ? num : defaultValue;
     };
 
-    // Extract name
+    
     const name = getString(
       (product as { name?: unknown }).name || 
       (product as { title?: unknown }).title, 
       'Produto sem nome'
     );
     
-    // Extract description
+    
     const description = getString(
       (product as { description?: unknown }).description || 
       (product as { details?: unknown }).details || 
@@ -339,14 +338,14 @@ export const fetchProductById = async (id: string | number): Promise<Product> =>
       'Sem descrição disponível'
     );
     
-    // Extract price
+   
     const priceNum = getNumber(
       (product as { price?: unknown }).price || 
       (product as { value?: unknown }).value || 
       (product as { amount?: unknown }).amount
     );
     
-    // Extract image
+
     let image = '/image/image.png';
     const rawImage = (product as { image?: unknown }).image || 
                     (product as { thumbnail?: unknown }).thumbnail || 
@@ -361,7 +360,7 @@ export const fetchProductById = async (id: string | number): Promise<Product> =>
       }
     }
     
-    // Handle images array
+ 
     const productImages = (product as { images?: unknown }).images;
     if (Array.isArray(productImages) && productImages.length > 0) {
       const firstImage = productImages[0];
@@ -375,7 +374,6 @@ export const fetchProductById = async (id: string | number): Promise<Product> =>
       }
     }
 
-    // Extract category
     let category = 'Categoria';
     const categoryValue = (product as { category?: unknown }).category;
     if (typeof categoryValue === 'string') {
@@ -387,28 +385,24 @@ export const fetchProductById = async (id: string | number): Promise<Product> =>
       }
     }
     
-    // Extract stock
     const stockNum = getNumber(
       (product as { stock?: unknown }).stock || 
       (product as { quantity?: unknown }).quantity || 
       (product as { qtd?: unknown }).qtd
     );
     
-    // Extract rating
     const ratingNum = getNumber(
       (product as { rating?: unknown }).rating || 
       (product as { rate?: unknown }).rate
     );
     
-    // Extract brand
-    const brand = getString(
+     const brand = getString(
       (product as { brand?: unknown }).brand || 
       (product as { maker?: unknown }).maker || 
       (product as { manufacturer?: unknown }).manufacturer,
       'Marca desconhecida'
     );
     
-    // Extract ID
     const productId = getNumber(
       (product as { id?: unknown }).id || id,
       typeof id === 'number' ? id : 0

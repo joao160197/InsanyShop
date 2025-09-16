@@ -4,19 +4,18 @@ import { Inter } from 'next/font/google';
 import "./globals.css";
 import ClientLayout from "./ClientLayout";
 
-// Load Geist Sans font
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
 });
 
-// Load Inter font
+
 const inter = Inter({ 
   subsets: ['latin'],
   variable: '--font-inter',
 });
 
-// Load Geist Mono font
+
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
