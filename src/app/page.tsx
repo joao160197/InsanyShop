@@ -134,7 +134,7 @@ function HomeContent() {
       case "best-sellers":
        
         return [...result].sort((a, b) => (b.rating || 0) - (a.rating || 0));
-      default: // newest
+      default:
         return result;
     }
   }, [products, filters.sort]);

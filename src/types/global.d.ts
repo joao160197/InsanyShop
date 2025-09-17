@@ -1,5 +1,4 @@
 
-// Define a response type for the test API
 interface TestApiResponse {
   success: boolean;
   message?: string;

@@ -41,7 +41,6 @@ export default function RootLayout({
         <script
           dangerouslySetInnerHTML={{
             __html: `
-              // Early script to remove bis_skin_checked before React hydration
               (function() {
                 function removeBisSkinChecked() {
                   var elements = document.querySelectorAll('[bis_skin_checked]');
@@ -49,9 +48,7 @@ export default function RootLayout({
                     elements[i].removeAttribute('bis_skin_checked');
                   }
                 }
-                // Run immediately
                 removeBisSkinChecked();
-                // Run again after a short delay
                 setTimeout(removeBisSkinChecked, 10);
               })();
             `,
